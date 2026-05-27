@@ -1,0 +1,229 @@
+/* ── SEARCH PAGE STYLES (Premium) ── */
+
+.search-bar-compact {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  padding: 18px 0;
+  box-shadow: 0 4px 16px rgba(37,99,235,.15);
+}
+.compact-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px; align-items: end;
+}
+.compact-form .form-label { color: rgba(255,255,255,.85); font-size: .82rem; }
+.compact-form .form-control {
+  background: rgba(255,255,255,.95);
+  border-color: transparent;
+  backdrop-filter: blur(4px);
+}
+.compact-form .form-control:focus {
+  background: var(--white);
+  border-color: rgba(255,255,255,.5);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.15);
+}
+
+/* LAYOUT */
+.search-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* FILTER SIDEBAR */
+.filter-sidebar {
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--gray-100); overflow: hidden;
+  position: sticky; top: 86px;
+  box-shadow: var(--shadow-sm);
+}
+.filter-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid var(--gray-100);
+  background: var(--gray-25);
+}
+.filter-header h3 { font-size: 1rem; }
+.filter-section { padding: 18px 20px; border-bottom: 1px solid var(--gray-100); }
+.filter-section:last-child { border-bottom: none; }
+.filter-section h4 {
+  font-size: .85rem; color: var(--gray-700); margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* TIME CHIPS */
+.time-chips { display: flex; flex-direction: column; gap: 6px; }
+.chip {
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200); font-size: .82rem;
+  cursor: pointer; transition: var(--transition); color: var(--gray-600);
+  font-weight: 500;
+}
+.chip:hover {
+  border-color: var(--primary-50); color: var(--primary);
+  background: var(--primary-light);
+}
+.chip.active {
+  border-color: var(--primary); background: var(--primary-light);
+  color: var(--primary); font-weight: 600;
+  box-shadow: 0 2px 8px rgba(37,99,235,.08);
+}
+
+/* CARRIER FILTER */
+.carrier-check { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.carrier-check input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+.carrier-check label { font-size: .85rem; color: var(--gray-700); cursor: pointer; }
+
+/* PRICE RANGE */
+.price-range { display: flex; align-items: center; gap: 8px; }
+.price-range .form-control { font-size: .82rem; }
+
+/* TOGGLE */
+.toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.toggle-label input { display: none; }
+.toggle-slider {
+  width: 42px; height: 24px; background: var(--gray-300);
+  border-radius: 12px; position: relative; transition: var(--transition);
+}
+.toggle-slider::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; background: white; border-radius: 50%;
+  transition: var(--transition-bounce); box-shadow: var(--shadow-sm);
+}
+.toggle-label input:checked + .toggle-slider {
+  background: var(--primary);
+  box-shadow: 0 2px 8px rgba(37,99,235,.25);
+}
+.toggle-label input:checked + .toggle-slider::after { transform: translateX(18px); }
+
+/* RESULTS HEADER */
+.results-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
+}
+#results-summary { font-weight: 600; color: var(--gray-800); }
+.sort-bar { display: flex; align-items: center; gap: 8px; }
+
+/* TRIP RESULT CARD */
+.trip-result-card {
+  background: var(--white); border-radius: 12px;
+  border: 1px solid var(--gray-200); margin-bottom: 10px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  overflow: hidden; position: relative;
+  display: flex; height: 110px;
+}
+.trip-result-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: linear-gradient(180deg, var(--primary) 0%, #7c3aed 100%);
+  opacity: 0; transition: opacity .2s ease; z-index: 2;
+}
+.trip-result-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px -4px rgba(37,99,235,0.15);
+  transform: translateY(-1px);
+}
+.trip-result-card:hover::before { opacity: 1; }
+
+/* Ảnh xe */
+.trc-img {
+  width: 130px; min-width: 130px; height: 100%; position: relative; flex-shrink: 0;
+}
+.trc-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.trc-img-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(15, 23, 42, 0.72); color: #fff;
+  font-size: 0.62rem; text-align: center; padding: 3px 4px;
+  font-weight: 600; letter-spacing: .02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Nội dung chính */
+.trc-main {
+  flex: 1; display: flex; align-items: stretch;
+  padding: 10px 14px 10px 16px; gap: 12px; min-width: 0;
+}
+
+/* Cột trái: Thông tin chuyến */
+.trc-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 5px; min-width: 0; }
+
+/* Hàng giờ */
+.trc-time-row { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.trc-time { font-size: 1.3rem; font-weight: 800; color: var(--gray-900); letter-spacing: -.03em; line-height: 1; white-space: nowrap; }
+.trc-time-dest { color: var(--primary-dark); }
+.trc-arrow { color: var(--gray-300); font-size: 0.9rem; flex-shrink: 0; }
+.trc-duration {
+  font-size: 0.72rem; color: var(--gray-400); background: var(--gray-100);
+  border-radius: 99px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0;
+}
+
+/* Hàng bến */
+.trc-station-row {
+  display: flex; align-items: center; gap: 0; font-size: 0.78rem;
+  color: var(--gray-600); white-space: nowrap; overflow: hidden;
+}
+.trc-station {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 160px;
+}
+.trc-station-sep { color: var(--gray-300); flex-shrink: 0; margin: 0 5px; font-weight: 300; }
+
+/* Hàng nhà xe */
+.trc-carrier-row { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.trc-carrier-name { font-size: 0.75rem; font-weight: 700; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.trc-dot { color: var(--gray-300); font-size: 0.6rem; flex-shrink: 0; }
+.trc-date-tag { font-size: 0.72rem; color: var(--gray-500); white-space: nowrap; }
+
+/* Cột phải: Mua vé */
+.trc-buy {
+  display: flex; flex-direction: column; align-items: flex-end;
+  justify-content: center; gap: 6px; flex-shrink: 0; text-align: right; min-width: 110px;
+}
+.trc-price { font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -.02em; line-height: 1; white-space: nowrap; }
+.trc-seats { font-size: 0.7rem; font-weight: 600; }
+.trc-btn { padding: 7px 16px; font-size: 0.78rem; white-space: nowrap; border-radius: 8px; width: 100%; }
+
+
+/* DATE NAV */
+.date-nav {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px;
+}
+.date-btn {
+  padding: 10px 18px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200); background: var(--white);
+  font-size: .83rem; cursor: pointer; transition: var(--transition);
+  white-space: nowrap; color: var(--gray-600); font-weight: 500;
+}
+.date-btn:hover {
+  border-color: var(--primary-50); color: var(--primary);
+  background: var(--primary-light);
+}
+.date-btn.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white; font-weight: 600;
+  box-shadow: var(--shadow-primary);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 80px 20px;
+}
+.empty-icon { font-size: 3.5rem; margin-bottom: 16px; }
+.empty-state h3 { color: var(--gray-700); }
+.empty-state p { margin-top: 8px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .search-layout { grid-template-columns: 1fr; }
+  .filter-sidebar { position: static; }
+  .compact-form { grid-template-columns: 1fr 1fr; }
+  .compact-form button { grid-column: span 2; }
+  .trc-main { grid-template-columns: 1fr auto; row-gap: 12px; }
+  .trc-carrier { display: none; }
+}
+@media (max-width: 600px) {
+  .compact-form { grid-template-columns: 1fr; }
+  .compact-form button { grid-column: 1; }
+  .trc-main { grid-template-columns: 1fr; }
+  .trc-action { text-align: left; display: flex; align-items: center; gap: 16px; }
+}

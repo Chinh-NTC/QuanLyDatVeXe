@@ -1,0 +1,238 @@
+@{
+    ViewData["Title"] = "Thanh toán — BusGo";
+    ViewData["ActiveNav"] = "search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section PageCss {
+  <link rel="stylesheet" href="~/assets/css/payment.css" asp-append-version="true" />
+}
+
+<!-- STEPS BAR -->
+<div class="steps-bar">
+  <div class="container">
+    <div class="steps">
+      <div class="step done"><span class="step-num">1</span><span class="step-label">Tìm chuyến</span></div>
+      <div class="step-line done"></div>
+      <div class="step done"><span class="step-num">2</span><span class="step-label">Chọn ghế</span></div>
+      <div class="step-line done"></div>
+      <div class="step active"><span class="step-num">3</span><span class="step-label">Thanh toán</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="container payment-layout" style="padding-top:32px;padding-bottom:60px">
+
+  <!-- LEFT: Form thanh toán -->
+  <main class="payment-main">
+
+    <!-- Trip Summary - Premium -->
+    <div class="card card-body mb-24" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; border: none; box-shadow: 0 10px 25px -5px rgba(59,130,246,0.4); padding: 20px 28px; border-radius: 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:20px; flex: 1;">
+          <div style="text-align:center;">
+            <div style="font-size:1.6rem; font-weight:800; line-height:1;">07:00</div>
+            <div style="font-size:0.85rem; opacity:0.9; margin-top:6px; font-weight:500;">Bến Mỹ Đình</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex: 1; max-width: 150px;">
+            <div style="width:100%; height:2px; background:rgba(255,255,255,0.4); position:relative; margin:8px 0; border-radius:2px;">
+              <div style="position:absolute; right:50%; top:-10px; transform:translateX(50%); font-size:16px;">🚌</div>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:1.6rem; font-weight:800; line-height:1;">21:00</div>
+            <div style="font-size:0.85rem; opacity:0.9; margin-top:6px; font-weight:500;">Bến Miền Đông</div>
+          </div>
+        </div>
+        <div style="text-align:right; border-left:1px solid rgba(255,255,255,0.2); padding-left:20px;">
+          <div style="font-size:0.8rem; opacity:0.8; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Ngày đi</div>
+          <div style="font-weight:700; font-size:1.1rem; margin-bottom:8px;">27/05/2026</div>
+          <div style="font-weight:600; font-size:0.9rem; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:4px; display:inline-block;">🏢 Phương Trang</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thông tin hành khách -->
+    <div class="card card-body mb-24">
+      <h3 class="mb-16">👤 Thông tin hành khách</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Họ tên <span style="color:var(--danger)">*</span></label>
+          <input type="text" class="form-control" id="pay-hoten" value="Nguyễn Văn A" readonly />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label>
+          <input type="tel" class="form-control" id="pay-sdt" value="0912345678" readonly />
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Ghi chú</label>
+        <input type="text" class="form-control" id="pay-ghichu" readonly value="" />
+      </div>
+    </div>
+
+    <!-- Ghế đã chọn -->
+    <div class="card card-body mb-24">
+      <h3 class="mb-16">🪑 Ghế đã chọn</h3>
+      <div id="pay-seat-list">
+        <div class="pay-seat-row" style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #f3f4f6">
+          <div class="pay-seat-badge" style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-size:.85rem;font-weight:600">🪑 Ghế A3</div>
+          <div style="font-weight:600">350.000₫</div>
+        </div>
+        <div class="pay-seat-row" style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #f3f4f6">
+          <div class="pay-seat-badge" style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-size:.85rem;font-weight:600">🪑 Ghế A7</div>
+          <div style="font-weight:600">350.000₫</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phương thức thanh toán -->
+    <div class="card card-body mb-24">
+      <h3 class="mb-16">💳 Phương thức thanh toán</h3>
+      <p class="text-sm text-muted mb-16">Chọn phương thức thanh toán phù hợp với bạn</p>
+      <div class="payment-methods">
+        <label class="pay-method active" id="pm-tienmat">
+          <input type="radio" name="phuong-thuc" value="TIENMAT" checked onchange="selectMethod('TIENMAT')" />
+          <div class="pm-icon">💵</div>
+          <div>
+            <div class="pm-name">Tiền mặt</div>
+            <div class="pm-desc">Thanh toán khi lên xe hoặc tại bến</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </label>
+
+        <div id="cash-warning" style="background:#fffbeb; border:1px solid #fde68a; color:#b45309; padding:12px; border-radius:8px; margin-top:-10px; margin-bottom:16px; font-size:0.85rem;">
+          ⚠️ <strong>Lưu ý:</strong> Vui lòng có mặt tại bến trước giờ khởi hành ít nhất <strong>30 phút</strong> để thanh toán tiền mặt và nhận vé.
+        </div>
+
+        <label class="pay-method" id="pm-chuyenkhoan">
+          <input type="radio" name="phuong-thuc" value="CHUYENKHOAN" onchange="selectMethod('CHUYENKHOAN')" />
+          <div class="pm-icon">🏦</div>
+          <div>
+            <div class="pm-name">Chuyển khoản ngân hàng</div>
+            <div class="pm-desc">Chuyển khoản trước, xác nhận qua SMS</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </label>
+      </div>
+
+      <!-- Bank info -->
+      <div class="bank-info hidden" id="bank-info">
+        <div class="bank-info-box">
+          <div class="bank-detail"><span>Ngân hàng</span><strong>Vietcombank</strong></div>
+          <div class="bank-detail"><span>Số tài khoản</span><strong class="copy-text" onclick="copyText('0123456789')">0123456789 📋</strong></div>
+          <div class="bank-detail"><span>Chủ tài khoản</span><strong>CÔNG TY BUSGO</strong></div>
+          <div class="bank-detail"><span>Số tiền cần TT</span><strong id="bank-amount" style="color:var(--primary)">700.000₫</strong></div>
+          <div class="bank-detail"><span>Nội dung CK</span><strong id="bank-content" class="copy-text">BusGo 0912345678</strong></div>
+        </div>
+        <p style="font-size:.82rem;color:var(--warning);margin-top:10px">
+          ⚠️ Chuyển khoản trong 30 phút. Đặt vé tự động hủy nếu chưa thanh toán.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mã khuyến mãi -->
+    <div class="card card-body mb-24" style="background:#f8fafc; border: 1px dashed #cbd5e1;">
+      <h3 class="mb-12" style="font-size:1.1rem; color:#334155;">🏷️ Mã khuyến mãi</h3>
+      <div style="display:flex; gap:12px; margin-bottom:12px;">
+        <input type="text" class="form-control" id="input-promo" placeholder="Nhập mã khuyến mãi..." style="flex:1; text-transform:uppercase; border:1px solid #cbd5e1; font-weight:600; letter-spacing: 0.5px;" />
+        <button class="btn btn-outline" type="button" onclick="applyPromo()" style="white-space:nowrap;">Áp dụng</button>
+      </div>
+      <div id="promo-msg" style="margin-top:8px; font-size:0.85rem; display:none; font-weight:500; padding:8px 12px; border-radius:6px;"></div>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms-check">
+      <input type="checkbox" id="accept-terms" onchange="checkReady()" />
+      <label for="accept-terms">
+        Tôi đồng ý với <a href="#" style="color:var(--primary)">Điều khoản dịch vụ</a> và
+        <a href="#" style="color:var(--primary)">Chính sách hủy vé</a> của BusGo
+      </label>
+    </div>
+
+    <input type="hidden" id="hdn-maChuyen" value="CX001" />
+    <input type="hidden" id="hdn-maGhes" value="A3,A7" />
+    <input type="hidden" id="hdn-giaVe" value="350000" />
+    <input type="hidden" id="hdn-promoCode" value="" />
+
+    <button class="btn btn-primary btn-block btn-lg" id="btn-confirm"
+            onclick="confirmBooking()" disabled style="margin-top:20px">
+      🎫 Xác nhận đặt vé
+    </button>
+    <a href="javascript:history.back()" class="btn btn-ghost btn-block" style="margin-top:8px">← Quay lại chọn ghế</a>
+  </main>
+
+  <!-- RIGHT: Order summary -->
+  <aside class="payment-sidebar">
+    <div class="card card-body">
+      <h3 class="mb-16">🧾 Tóm tắt đơn hàng</h3>
+
+      <div id="pay-summary-rows">
+        <div class="summary-row"><span>Ghế A3</span><span>350.000₫</span></div>
+        <div class="summary-row"><span>Ghế A7</span><span>350.000₫</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="summary-row" id="pay-discount-row" style="display:none">
+        <span style="color:var(--success)">Khuyến mãi</span>
+        <strong id="pay-discount" style="color:var(--success)">--</strong>
+      </div>
+      <div class="summary-row" style="padding:14px 0">
+        <span style="font-weight:700;font-size:1rem">Tổng cộng</span>
+        <strong class="price-tag" id="pay-total">700.000₫</strong>
+      </div>
+      <div class="summary-row">
+        <span style="color:var(--primary)">Tiền cần thanh toán</span>
+        <strong id="pay-deposit" style="color:var(--primary);font-size:1.1rem">700.000₫</strong>
+      </div>
+
+      <div class="divider"></div>
+      <div style="font-size:.8rem;color:var(--gray-500);line-height:1.6">
+        <p>🔒 Giao dịch được bảo mật SSL</p>
+        <p>📞 Hỗ trợ: 1900 xxxx (7:00–22:00)</p>
+        <p>⏰ Giữ ghế trong <strong id="countdown" style="color:var(--danger)">10:00</strong></p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal" style="max-width:480px;text-align:center">
+    <div class="modal-body" style="padding:40px">
+      <div style="font-size:4rem;margin-bottom:16px">🎉</div>
+      <h2 style="color:var(--success)">Đặt vé thành công!</h2>
+      <p style="margin:12px 0">Cảm ơn bạn đã đặt vé tại BusGo.<br/>Mã đơn hàng của bạn:</p>
+      <div style="font-size:1.8rem;font-weight:800;color:var(--primary);letter-spacing:.1em;margin:16px 0" id="order-code">--</div>
+      <p style="font-size:.85rem;color:var(--gray-500)">Thông tin vé đã được lưu vào tài khoản của bạn</p>
+      <div style="display:flex;gap:12px;margin-top:24px;justify-content:center">
+        <a href="/Account?tab=orders" class="btn btn-primary">Xem vé của tôi</a>
+        <a href="/" class="btn btn-outline">Về trang chủ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    window.CTX = '';
+    window.TRIP_DATA = { maChuyen:"CX001", giaVe:350000, benDi:'Bến Mỹ Đình', benDen:'Bến Miền Đông', ngayDi:'27/05/2026', gioDi:'07:00', tenNhaXe:'Phương Trang' };
+    function onSelectPromoChange(val) { const input = document.getElementById('input-promo'); if(input) input.value = val; applyPromo(); }
+    function selectMethod(method) {
+      const cashWarning = document.getElementById('cash-warning');
+      const bankInfo = document.getElementById('bank-info');
+      document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+      document.getElementById('pm-' + method.toLowerCase()).classList.add('active');
+      if (method === 'CHUYENKHOAN') { cashWarning.style.display='none'; bankInfo.classList.remove('hidden'); }
+      else { cashWarning.style.display='block'; bankInfo.classList.add('hidden'); }
+    }
+    function checkReady() {
+      const checked = document.getElementById('accept-terms').checked;
+      document.getElementById('btn-confirm').disabled = !checked;
+    }
+    function applyPromo() { showToast('Đang kiểm tra mã khuyến mãi...', 'info'); }
+    function confirmBooking() { openModal('success-modal'); document.getElementById('order-code').textContent = 'DV' + Date.now().toString().slice(-6); }
+  </script>
+  <script src="~/assets/js/payment.js" asp-append-version="true"></script>
+}

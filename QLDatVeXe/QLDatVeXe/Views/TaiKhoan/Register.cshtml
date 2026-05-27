@@ -1,0 +1,161 @@
+@{
+    ViewData["Title"] = "Đăng nhập / Đăng ký — BusGo";
+    Layout = null; // Login page không dùng layout chung
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"]</title>
+  <link rel="stylesheet" href="~/assets/css/style.css" />
+  <link rel="stylesheet" href="~/assets/css/login.css" />
+</head>
+<body class="login-body">
+
+<div class="login-page">
+
+  <!-- LEFT PANEL -->
+  <div class="login-left">
+    <a href="/" class="login-logo">
+      <img src="~/assets/img/logo.svg" alt="Logo" style="width:32px;height:32px;vertical-align:middle;margin-top:-6px;margin-right:4px;">BusGo
+    </a>
+    <div class="login-illustration">
+      <div class="illus-bus">🚌</div>
+    </div>
+    <div class="login-tagline">
+      <h2>Đặt vé xe <br/>nhanh chóng &amp; tiện lợi</h2>
+      <p>Hàng trăm tuyến xe, giá tốt nhất,<br/>thanh toán an toàn.</p>
+    </div>
+    <div class="login-features">
+      <div class="lf-item"><span>✅</span> Đặt vé trong 2 phút</div>
+      <div class="lf-item"><span>✅</span> Chọn ghế linh hoạt</div>
+      <div class="lf-item"><span>✅</span> Hủy vé dễ dàng</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="login-right">
+    <div class="login-card">
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Đăng ký</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="form-login" method="post" action="/Login">
+        <div class="form-group mb-16">
+          <label class="form-label">Tên đăng nhập</label>
+          <input type="text" class="form-control" id="login-username" name="tenDangNhap"
+                 placeholder="Nhập tên đăng nhập" autocomplete="username" required />
+        </div>
+        <div class="form-group mb-16">
+          <label class="form-label">Mật khẩu</label>
+          <div class="input-eye">
+            <input type="password" class="form-control" id="login-password" name="matKhau"
+                   placeholder="Nhập mật khẩu" autocomplete="current-password" required />
+            <button type="button" class="eye-btn" onclick="togglePwd('login-password',this)">👁</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+          <a href="#" style="font-size:.83rem;color:var(--primary)">Quên mật khẩu?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-login">
+          Đăng nhập
+        </button>
+        <div class="login-divider"><span>hoặc</span></div>
+        <div style="text-align:center;font-size:.85rem;color:var(--gray-500)">
+          Chưa có tài khoản?
+          <a href="#" onclick="switchAuthTab('register')" style="color:var(--primary);font-weight:600">Đăng ký ngay</a>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="form-register" class="hidden" method="post" action="/Register">
+        <div class="grid-2" style="gap:12px">
+          <div class="form-group">
+            <label class="form-label">Họ tên <span style="color:var(--danger)">*</span></label>
+            <input type="text" class="form-control" id="reg-hoten" name="hoTen"
+                   placeholder="Nguyễn Văn A" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại <span style="color:var(--danger)">*</span></label>
+            <input type="tel" class="form-control" id="reg-sdt" name="sdt"
+                   placeholder="0912345678" required />
+          </div>
+        </div>
+        <div class="form-group mb-12" style="margin-top:12px">
+          <label class="form-label">Tên đăng nhập <span style="color:var(--danger)">*</span></label>
+          <input type="text" class="form-control" id="reg-username" name="tenDangNhap"
+                 placeholder="Tối thiểu 5 ký tự" required minlength="5" />
+        </div>
+        <div class="form-group mb-12">
+          <label class="form-label">Mật khẩu <span style="color:var(--danger)">*</span></label>
+          <div class="input-eye">
+            <input type="password" class="form-control" id="reg-password" name="matKhau"
+                   placeholder="Tối thiểu 6 ký tự" required minlength="6" />
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-password',this)">👁</button>
+          </div>
+        </div>
+        <div class="form-group mb-16">
+          <label class="form-label">Xác nhận mật khẩu <span style="color:var(--danger)">*</span></label>
+          <div class="input-eye">
+            <input type="password" class="form-control" id="reg-confirm" name="xacNhanMatKhau"
+                   placeholder="Nhập lại mật khẩu" required />
+            <button type="button" class="eye-btn" onclick="togglePwd('reg-confirm',this)">👁</button>
+          </div>
+        </div>
+        <div class="form-group mb-16">
+          <label class="form-label">Giới tính</label>
+          <div style="display:flex;gap:16px;margin-top:6px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem">
+              <input type="radio" name="gioiTinh" value="1" /> Nam
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.88rem">
+              <input type="radio" name="gioiTinh" value="0" /> Nữ
+            </label>
+          </div>
+        </div>
+        <div class="terms-check mb-16"
+             style="display:flex;gap:8px;align-items:flex-start;font-size:.83rem;color:var(--gray-600)">
+          <input type="checkbox" id="reg-terms" required style="margin-top:3px;accent-color:var(--primary)" />
+          <label for="reg-terms">Tôi đồng ý với <a href="#" style="color:var(--primary)">Điều khoản dịch vụ</a> của BusGo</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-register">
+          Tạo tài khoản
+        </button>
+        <div style="text-align:center;margin-top:16px;font-size:.85rem;color:var(--gray-500)">
+          Đã có tài khoản?
+          <a href="#" onclick="switchAuthTab('login')" style="color:var(--primary);font-weight:600">Đăng nhập</a>
+        </div>
+      </form>
+
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <a href="/" style="font-size:.85rem;color:var(--gray-500)">← Về trang chủ</a>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="~/assets/js/app.js"></script>
+<script src="~/assets/js/login.js"></script>
+<script>
+  function togglePwd(id, btn) {
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+    btn.textContent = el.type === 'password' ? '👁' : '🙈';
+  }
+  function switchAuthTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+    document.getElementById('form-register').classList.toggle('hidden', isLogin);
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  }
+</script>
+</body>
+</html>

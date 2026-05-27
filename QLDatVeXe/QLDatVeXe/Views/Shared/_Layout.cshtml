@@ -1,50 +1,72 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QLDatVeXe</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QLDatVeXe.styles.css" asp-append-version="true" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] — BusGo</title>
+  <meta name="description" content="@(ViewData["Description"] ?? "Đặt vé xe online dễ dàng, nhanh chóng. Tìm kiếm hàng trăm tuyến xe, chọn ghế linh hoạt, thanh toán an toàn.")" />
+  <link rel="stylesheet" href="~/assets/css/style.css" asp-append-version="true" />
+  @RenderSection("PageCss", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QLDatVeXe</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+<body class="@ViewData["BodyClass"]">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - QLDatVeXe - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+@* NAVBAR *@
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <a href="/" class="navbar-logo">
+        <div class="logo-icon"><img src="~/assets/img/logo.svg" alt="BusGo Logo"></div>
+        <span class="logo-text">BusGo</span>
+      </a>
+      <ul class="navbar-menu" id="navbar-menu">
+        <li><a href="/" class="@(ViewData["ActiveNav"]?.ToString() == "home" ? "active" : "")">Trang chủ</a></li>
+        <li><a href="/Search" class="@(ViewData["ActiveNav"]?.ToString() == "search" ? "active" : "")">Tìm chuyến</a></li>
+        <li><a href="/NhaXe" class="@(ViewData["ActiveNav"]?.ToString() == "nhaxe" ? "active" : "")">Nhà xe</a></li>
+      </ul>
+      <div class="navbar-actions" id="navbar-actions">
+        <a href="/Login" class="btn btn-ghost">Đăng nhập</a>
+        <a href="/Register" class="btn btn-primary">Đăng ký</a>
+      </div>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+@RenderBody()
+
+@* FOOTER *@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">🚌 BusGo</div>
+        <p>Nền tảng đặt vé xe trực tuyến hàng đầu, kết nối hành khách với hàng trăm nhà xe uy tín trên toàn quốc.</p>
+      </div>
+      <div>
+        <h5>Dịch vụ</h5>
+        <ul>
+          <li><a href="/Search">Tìm chuyến xe</a></li>
+          <li><a href="/Account?tab=orders">Lịch sử đặt vé</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Liên hệ</h5>
+        <ul>
+          <li><a href="#">📞 1900 xxxx</a></li>
+          <li><a href="#">✉️ support@busgo.vn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BusGo. Tất cả quyền được bảo lưu.</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="~/assets/js/app.js" asp-append-version="true"></script>
+@RenderSection("Scripts", required: false)
 </body>
 </html>

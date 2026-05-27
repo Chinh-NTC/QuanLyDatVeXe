@@ -1,0 +1,246 @@
+@{
+    ViewData["Title"] = "Tài khoản — BusGo";
+    ViewData["ActiveNav"] = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string activeTab = ViewData["Tab"]?.ToString() ?? "orders";
+}
+
+@section PageCss {
+  <link rel="stylesheet" href="~/assets/css/account.css" asp-append-version="true" />
+}
+
+<div class="container account-layout" style="padding-top:32px;padding-bottom:60px">
+
+  <!-- SIDEBAR -->
+  <aside class="account-sidebar">
+    <div class="card card-body" style="text-align:center;padding-bottom:20px">
+      <div class="account-avatar" id="acc-avatar">N</div>
+      <div class="account-name" id="acc-name">Nguyễn Văn A</div>
+      <div class="account-phone" id="acc-phone">0912345678</div>
+    </div>
+    <nav class="acc-nav">
+      <a class="acc-nav-item @(activeTab=="orders"?"active":"")" href="/Account?tab=orders">🎫 Lịch sử đặt vé</a>
+      <a class="acc-nav-item @(activeTab=="profile"?"active":"")" href="/Account?tab=profile">👤 Thông tin cá nhân</a>
+      <a class="acc-nav-item @(activeTab=="reviews"?"active":"")" href="/Account?tab=reviews">⭐ Đánh giá của tôi</a>
+      <a class="acc-nav-item danger" href="/Logout">🚪 Đăng xuất</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="account-main">
+
+    @* ─── ORDERS TAB ─── *@
+    @if (activeTab == "orders")
+    {
+      <div class="tab-panel active">
+        <div class="tab-header">
+          <h2>🎫 Lịch sử đặt vé</h2>
+          <div class="order-filters">
+            <select class="form-control" style="width:auto" id="order-filter" onchange="filterOrders()">
+              <option value="">Tất cả</option>
+              <option value="CHOXULY">Chờ xử lý</option>
+              <option value="DAXACNHAN">Đã xác nhận</option>
+              <option value="DAHUY">Đã hủy</option>
+              <option value="HOANTHANH">Hoàn thành</option>
+            </select>
+          </div>
+        </div>
+        <div id="orders-list">
+          <!-- Đơn mẫu 1 -->
+          <a href="/TicketDetail?maDon=DV001" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
+            <div class="order-card" data-status="DAXACNHAN">
+              <div class="order-header">
+                <div>
+                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV001</span>
+                  <span class="order-date">25/05/2026 09:30</span>
+                </div>
+                <span class="badge badge-success">Đã xác nhận</span>
+              </div>
+              <div class="order-body">
+                <div class="order-meta">
+                  <div class="order-meta-item"><span>Tổng tiền</span><strong>700.000₫</strong></div>
+                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>700.000₫</strong></div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                  <span class="badge badge-primary">🪑 Tầng 1 · Ghế A3</span>
+                  <span class="badge badge-primary">🪑 Tầng 1 · Ghế A7</span>
+                </div>
+              </div>
+              <div class="order-footer">
+                <div class="order-actions">
+                  <span class="btn btn-sm" style="background:white; color:var(--primary); border:1px solid var(--primary)">Chi tiết vé</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Đơn mẫu 2 -->
+          <a href="/TicketDetail?maDon=DV002" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
+            <div class="order-card" data-status="HOANTHANH">
+              <div class="order-header">
+                <div>
+                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV002</span>
+                  <span class="order-date">10/05/2026 14:00</span>
+                </div>
+                <span class="badge badge-gray">Hoàn thành</span>
+              </div>
+              <div class="order-body">
+                <div class="order-meta">
+                  <div class="order-meta-item"><span>Tổng tiền</span><strong>350.000₫</strong></div>
+                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>350.000₫</strong></div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                  <span class="badge badge-success">🪑 Tầng 1 · Ghế B5</span>
+                </div>
+              </div>
+              <div class="order-footer">
+                <div class="order-actions">
+                  <span class="btn btn-sm" style="background:var(--primary); color:white">Đánh giá</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Đơn mẫu 3 -->
+          <a href="/TicketDetail?maDon=DV003" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
+            <div class="order-card" data-status="DAHUY">
+              <div class="order-header">
+                <div>
+                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV003</span>
+                  <span class="order-date">01/05/2026 08:00</span>
+                </div>
+                <span class="badge badge-danger">Đã hủy</span>
+              </div>
+              <div class="order-body">
+                <div class="order-meta">
+                  <div class="order-meta-item"><span>Tổng tiền</span><strong>180.000₫</strong></div>
+                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>0₫</strong></div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                  <span class="badge badge-danger" style="text-decoration: line-through;">🪑 Tầng 2 · Ghế B3</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    }
+
+    @* ─── PROFILE TAB ─── *@
+    @if (activeTab == "profile")
+    {
+      <div class="tab-panel active">
+        <div class="tab-header"><h2>👤 Thông tin cá nhân</h2></div>
+        <div class="card card-body">
+          <form method="post" action="/Account">
+            <input type="hidden" name="action" value="updateProfile" />
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Họ tên</label>
+                <input type="text" class="form-control" name="hoTen" id="prof-hoten" value="Nguyễn Văn A" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số điện thoại</label>
+                <input type="tel" class="form-control" id="prof-sdt" value="0912345678" readonly />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Giới tính</label>
+                <select class="form-control" name="gioiTinh" id="prof-gioitinh">
+                  <option value="">-- Chọn --</option>
+                  <option value="1" selected>Nam</option>
+                  <option value="0">Nữ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ngày tạo tài khoản</label>
+                <input type="text" class="form-control" value="01/01/2026" readonly />
+              </div>
+            </div>
+            <div style="margin-top:20px">
+              <button type="submit" class="btn btn-primary">💾 Lưu thay đổi</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    @* ─── REVIEWS TAB ─── *@
+    @if (activeTab == "reviews")
+    {
+      <div class="tab-panel active">
+        <div class="tab-header"><h2>⭐ Đánh giá của tôi</h2></div>
+        <div id="reviews-list">
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-stars">★★★★★</div>
+              <span class="review-date">15/05/2026</span>
+            </div>
+            <div class="review-route">🚌 Bến Mỹ Đình → Bến Miền Đông</div>
+            <div class="review-comment">Chuyến xe rất tốt, tài xế lái ổn định, xe sạch sẽ, đúng giờ. Sẽ đặt lại lần sau!</div>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-stars">★★★★☆</div>
+              <span class="review-date">12/05/2026</span>
+            </div>
+            <div class="review-route">🚌 Bến Miền Đông → Bến Đà Lạt</div>
+            <div class="review-comment">Xe thoải mái, điều hòa mát. Chỉ hơi trễ 15 phút so với lịch.</div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="review-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>⭐ Đánh giá chuyến xe</h3>
+      <button class="modal-close" onclick="closeModal('review-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted mb-16" id="review-trip-label">Chuyến xe --</p>
+      <div class="form-group mb-16">
+        <label class="form-label">Điểm đánh giá (1–5)</label>
+        <div class="star-rating" id="star-rating">
+          <span class="star-btn" data-v="1" onclick="setStar(1)">★</span>
+          <span class="star-btn" data-v="2" onclick="setStar(2)">★</span>
+          <span class="star-btn" data-v="3" onclick="setStar(3)">★</span>
+          <span class="star-btn" data-v="4" onclick="setStar(4)">★</span>
+          <span class="star-btn" data-v="5" onclick="setStar(5)">★</span>
+        </div>
+      </div>
+      <div class="form-group mb-16">
+        <label class="form-label">Bình luận</label>
+        <textarea class="form-control" id="review-comment" rows="3" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitReview()">Gửi đánh giá</button>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    window.CTX = '';
+    window.ACC_DATA = { hoTen: 'Nguyễn Văn A', sdt: '0912345678', tab: '@activeTab' };
+    function filterOrders() {
+      const val = document.getElementById('order-filter').value;
+      document.querySelectorAll('.order-card').forEach(card => {
+        const st = card.getAttribute('data-status');
+        card.closest('.order-card-link').style.display = (!val || st === val) ? 'block' : 'none';
+      });
+    }
+    function setStar(val) {
+      document.querySelectorAll('.star-btn').forEach((s, i) => {
+        s.style.color = i < val ? '#f59e0b' : '#94a3b8';
+      });
+    }
+    function submitReview() {
+      showToast('Đánh giá của bạn đã được gửi!', 'success');
+      closeModal('review-modal');
+    }
+  </script>
+  <script src="~/assets/js/account.js" asp-append-version="true"></script>
+}

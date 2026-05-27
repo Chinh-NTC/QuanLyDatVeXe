@@ -1,0 +1,95 @@
+@{
+    ViewData["Title"] = "Quản lý Nhân viên";
+    ViewData["AdminNav"] = "nhanvien";
+    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+  <div>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b;">👨‍💼 Danh sách Nhân viên</h2>
+    <p style="color:#64748b;font-size:0.88rem;margin-top:4px;">Quản lý tài khoản và phân quyền nhân viên nội bộ</p>
+  </div>
+  <button class="admin-topbar-btn" style="background:#3b82f6;color:white;border-color:#3b82f6;">+ Thêm nhân viên</button>
+</div>
+
+<!-- FILTER BAR -->
+<div style="background:white;border-radius:12px;padding:16px 20px;border:1px solid #f1f5f9;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+  <select class="form-control" style="width:auto;min-width:140px;">
+    <option>Tất cả vai trò</option>
+    <option>Admin</option>
+    <option>Nhân viên</option>
+  </select>
+  <select class="form-control" style="width:auto;min-width:140px;">
+    <option>Trạng thái</option>
+    <option>Đang làm việc</option>
+    <option>Đã nghỉ</option>
+    <option>Đã khóa</option>
+  </select>
+  <input type="text" class="form-control" style="flex:1;min-width:200px;" placeholder="🔍 Tìm tên, SĐT, email, mã NV..." />
+  <button class="admin-topbar-btn">Lọc</button>
+</div>
+
+<!-- DATA TABLE -->
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Mã NV</th>
+        <th>Họ tên</th>
+        <th>Số điện thoại</th>
+        <th>Tên đăng nhập</th>
+        <th>Vai trò</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>NV001</strong></td>
+        <td>Nguyễn Quản Trị</td>
+        <td>0988123456</td>
+        <td>admin_nguyen</td>
+        <td><span class="badge badge-danger">Admin</span></td>
+        <td><span class="badge badge-success">Đang làm việc</span></td>
+        <td style="display:flex;gap:6px;">
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Chi tiết</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>NV002</strong></td>
+        <td>Lê Nhân Viên</td>
+        <td>0977654321</td>
+        <td>nv_le</td>
+        <td><span class="badge badge-info">Nhân viên</span></td>
+        <td><span class="badge badge-success">Đang làm việc</span></td>
+        <td style="display:flex;gap:6px;">
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Chi tiết</button>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Khóa</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>NV003</strong></td>
+        <td>Trần Hỗ Trợ</td>
+        <td>0966777888</td>
+        <td>nv_tran</td>
+        <td><span class="badge badge-info">Nhân viên</span></td>
+        <td><span class="badge badge-success">Đang làm việc</span></td>
+        <td style="display:flex;gap:6px;">
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Chi tiết</button>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Khóa</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>NV004</strong></td>
+        <td>Phạm Nghỉ Việc</td>
+        <td>0911222333</td>
+        <td>nv_pham</td>
+        <td><span class="badge badge-info">Nhân viên</span></td>
+        <td><span class="badge badge-gray">Đã nghỉ</span></td>
+        <td style="display:flex;gap:6px;">
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Chi tiết</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

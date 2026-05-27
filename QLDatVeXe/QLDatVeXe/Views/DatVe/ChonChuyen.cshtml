@@ -1,0 +1,159 @@
+@{
+    ViewData["Title"] = "Tìm chuyến xe — BusGo";
+    ViewData["Description"] = "Tìm kiếm chuyến xe theo tỉnh đi, tỉnh đến và ngày đi. So sánh giá vé, ghế còn trống.";
+    ViewData["ActiveNav"] = "search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section PageCss {
+  <link rel="stylesheet" href="~/assets/css/search.css" asp-append-version="true" />
+}
+
+<!-- SEARCH BAR compact -->
+<div class="search-bar-compact">
+  <div class="container">
+    <form class="compact-form" method="get" action="/Search" onsubmit="return validateSearchForm(this)">
+      <div class="form-group">
+        <label class="form-label">Tỉnh đi</label>
+        <select class="form-control" name="maTinhDi" id="sbc-tinh-di">
+          <option value="">-- Tất cả --</option>
+          <option value="HN">Hà Nội</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="HP">Hải Phòng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="DL">Đà Lạt</option>
+          <option value="NT">Nha Trang</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tỉnh đến</label>
+        <select class="form-control" name="maTinhDen" id="sbc-tinh-den">
+          <option value="">-- Tất cả --</option>
+          <option value="HN">Hà Nội</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="HP">Hải Phòng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="DL">Đà Lạt</option>
+          <option value="NT">Nha Trang</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ngày đi</label>
+        <input type="date" class="form-control" name="ngayDi" id="sbc-ngay-di" />
+      </div>
+      <button class="btn btn-primary" type="submit">🔍 Tìm</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="container search-layout" style="padding-top:32px;padding-bottom:60px">
+
+  <!-- SIDEBAR FILTER -->
+  <aside class="filter-sidebar" id="filter-sidebar">
+    <div class="filter-header">
+      <h3>🔧 Bộ lọc</h3>
+      <button class="btn btn-ghost btn-sm" onclick="resetFilters()">Xóa lọc</button>
+    </div>
+
+    <div class="filter-section">
+      <h4>Giờ xuất phát</h4>
+      <div class="time-chips" id="time-chips">
+        <div class="chip active" data-time="all"       onclick="selectTime(this,'all')">Tất cả</div>
+        <div class="chip"        data-time="early"     onclick="selectTime(this,'early')">Sáng sớm (00-06h)</div>
+        <div class="chip"        data-time="morning"   onclick="selectTime(this,'morning')">Buổi sáng (06-12h)</div>
+        <div class="chip"        data-time="afternoon" onclick="selectTime(this,'afternoon')">Buổi chiều (12-18h)</div>
+        <div class="chip"        data-time="evening"   onclick="selectTime(this,'evening')">Buổi tối (18-24h)</div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Nhà xe</h4>
+      <div id="carrier-filters">
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
+          <input type="checkbox" checked /> Phương Trang
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
+          <input type="checkbox" checked /> Thành Bưởi
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
+          <input type="checkbox" checked /> Hoàng Long
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;cursor:pointer">
+          <input type="checkbox" checked /> Kumho Samco
+        </label>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Khoảng giá (VNĐ)</h4>
+      <div class="price-range">
+        <input type="number" class="form-control" id="price-min" placeholder="Từ" step="10000" min="0" />
+        <span>—</span>
+        <input type="number" class="form-control" id="price-max" placeholder="Đến" step="10000" />
+      </div>
+      <button class="btn btn-outline btn-sm w-full" style="margin-top:10px" onclick="applyFilters()">Áp dụng</button>
+    </div>
+  </aside>
+
+  <!-- RESULTS -->
+  <main class="search-results">
+    <div class="results-header" id="results-header">
+      <div id="results-summary">
+        Tìm thấy <strong>5</strong> chuyến xe
+      </div>
+      <div class="sort-bar">
+        <span class="text-sm text-muted">Sắp xếp:</span>
+        <select class="form-control" style="width:auto" id="sort-select" onchange="applyFilters()">
+          <option value="gio">Giờ đi sớm nhất</option>
+          <option value="gia_asc">Giá thấp nhất</option>
+          <option value="gia_desc">Giá cao nhất</option>
+          <option value="ghe">Nhiều ghế nhất</option>
+        </select>
+      </div>
+    </div>
+
+    <script>
+      window.TRIPS_DATA = [
+        { maChuyen:"CX001", gioDi:"07:00", gioDiShort:"07:00", gioDenShort:"21:00", benDi:"Bến Mỹ Đình", benDen:"Bến Miền Đông", ngayDi:"27/05/2026", giaVe:350000, loaiXe:"Giường nằm", imgXe:"x1.jpg", tenNhaXe:"Phương Trang", khoangCach:1700, thoiGian:840, soGheTrong:12, bookUrl:"/Booking?maChuyen=CX001" },
+        { maChuyen:"CX002", gioDi:"08:30", gioDiShort:"08:30", gioDenShort:"13:00", benDi:"Bến Miền Đông", benDen:"Bến Đà Lạt", ngayDi:"27/05/2026", giaVe:180000, loaiXe:"Limousine VIP", imgXe:"x2.jpg", tenNhaXe:"Thành Bưởi", khoangCach:300, thoiGian:270, soGheTrong:5, bookUrl:"/Booking?maChuyen=CX002" },
+        { maChuyen:"CX003", gioDi:"06:00", gioDiShort:"06:00", gioDenShort:"09:00", benDi:"Bến Đà Nẵng", benDen:"Bến Hội An", ngayDi:"27/05/2026", giaVe:120000, loaiXe:"Xe 2 tầng", imgXe:"x3.jpg", tenNhaXe:"Hoàng Long", khoangCach:30, thoiGian:180, soGheTrong:20, bookUrl:"/Booking?maChuyen=CX003" },
+        { maChuyen:"CX004", gioDi:"14:00", gioDiShort:"14:00", gioDenShort:"22:00", benDi:"Bến Giáp Bát", benDen:"Bến Vinh", ngayDi:"27/05/2026", giaVe:220000, loaiXe:"Ghế ngồi", imgXe:"x4.jpg", tenNhaXe:"Kumho Samco", khoangCach:290, thoiGian:480, soGheTrong:8, bookUrl:"/Booking?maChuyen=CX004" },
+        { maChuyen:"CX005", gioDi:"22:00", gioDiShort:"22:00", gioDenShort:"06:00", benDi:"Bến TP.HCM", benDen:"Bến Cần Thơ", ngayDi:"27/05/2026", giaVe:150000, loaiXe:"Giường nằm", imgXe:"x5.jpg", tenNhaXe:"Phương Trang", khoangCach:170, thoiGian:480, soGheTrong:15, bookUrl:"/Booking?maChuyen=CX005" }
+      ];
+      window.CTX = '';
+    </script>
+
+    <div id="trip-list"></div>
+
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-icon">🔍</div>
+      <h3>Không tìm thấy chuyến xe nào</h3>
+      <p style="margin-top:10px">Thử thay đổi ngày đi hoặc tỉnh thành khác.</p>
+      <div style="margin-top:24px; display:flex; gap:12px; justify-content:center">
+        <a href="/" class="btn btn-outline">Về trang chủ</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+@section Scripts {
+  <script src="~/assets/js/search.js" asp-append-version="true"></script>
+  <script>
+    function resetFilters() {
+      document.querySelectorAll('#time-chips .chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('#time-chips .chip[data-time="all"]').classList.add('active');
+      document.getElementById('price-min').value = '';
+      document.getElementById('price-max').value = '';
+      applyFilters();
+    }
+    function selectTime(el, val) {
+      document.querySelectorAll('#time-chips .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      applyFilters();
+    }
+    function applyFilters() { if(typeof renderTrips === 'function') renderTrips(); }
+  </script>
+}

@@ -1,0 +1,169 @@
+@{
+    ViewData["Title"] = "Chi tiết vé #DV001 | BusGo";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <title>@ViewData["Title"]</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="~/assets/css/style.css" />
+  <style>
+    :root { --ticket-bg: #fff; --ticket-border: #e2e8f0; --ticket-primary: #2563eb; --ticket-secondary: #64748b; }
+    body { background: #f8fafc; }
+    .ticket-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+    .ticket-card { background: var(--ticket-bg); border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid var(--ticket-border); position: relative; }
+    .ticket-header { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+    .ticket-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+    .ticket-status { padding: 6px 16px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+    .status-paid { background: #dcfce7; color: #166534; }
+    .status-unpaid { background: #fef9c3; color: #854d0e; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .ticket-body { padding: 40px; }
+    .trip-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; }
+    .location { text-align: center; flex: 1; }
+    .location h3 { font-size: 1.8rem; font-weight: 700; color: #1e293b; margin: 0; }
+    .location p { color: var(--ticket-secondary); margin: 4px 0 0; font-size: 0.9rem; }
+    .trip-path { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; padding: 0 20px; }
+    .path-line { width: 100%; height: 2px; background: #cbd5e1; position: relative; margin: 10px 0; }
+    .path-line::before, .path-line::after { content: ''; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #2563eb; top: -3px; }
+    .path-line::before { left: 0; }
+    .path-line::after { right: 0; }
+    .trip-duration { font-size: 0.8rem; color: var(--ticket-secondary); font-weight: 600; }
+    .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; border-top: 1px dashed #e2e8f0; padding-top: 30px; }
+    .detail-item label { display: block; font-size: 0.8rem; color: var(--ticket-secondary); margin-bottom: 4px; }
+    .detail-item span { font-size: 1.1rem; font-weight: 600; color: #1e293b; }
+    .seats-section { margin-top: 40px; }
+    .seats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .seats-header h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+    .seat-badge { background: #eff6ff; color: #2563eb; padding: 8px 16px; border-radius: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #dbeafe; margin-right: 8px; margin-bottom: 8px; }
+    .ticket-actions { padding: 30px 40px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 16px; justify-content: flex-end; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(4px); }
+    .modal-content { background: white; max-width: 500px; margin: 100px auto; border-radius: 20px; padding: 30px; position: relative; }
+    .modal-header { margin-bottom: 20px; }
+    .modal-header h3 { margin: 0; font-size: 1.25rem; }
+    .star-rating { display: flex; gap: 8px; font-size: 1.5rem; cursor: pointer; color: #cbd5e1; margin: 15px 0; }
+    .star-rating .active { color: #f59e0b; }
+  </style>
+</head>
+<body>
+
+<div class="ticket-container">
+  <a href="/Account?tab=orders" style="display:inline-flex; align-items:center; color:var(--ticket-secondary); text-decoration:none; margin-bottom:20px; font-weight:600;">
+    ← Quay lại lịch sử
+  </a>
+
+  <div class="ticket-card">
+    <div class="ticket-header">
+      <div>
+        <h1>VÉ XE BUSGO</h1>
+        <span style="opacity: 0.8; font-size: 0.9rem">Mã đơn: #DV001</span>
+      </div>
+      <div class="ticket-status status-paid">Đã thanh toán</div>
+    </div>
+
+    <div class="ticket-body">
+      <div class="trip-info">
+        <div class="location">
+          <h3>Hà Nội</h3>
+          <p>Bến Mỹ Đình</p>
+        </div>
+        <div class="trip-path">
+          <span class="trip-duration">840 phút</span>
+          <div class="path-line"></div>
+          <span style="font-size: 1.1rem; font-weight: 700; color: #2563eb">07:00</span>
+        </div>
+        <div class="location">
+          <h3>TP. HCM</h3>
+          <p>Bến Miền Đông</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Ngày đi</label>
+          <span>27/05/2026</span>
+        </div>
+        <div class="detail-item">
+          <label>Nhà xe</label>
+          <span>Phương Trang</span>
+        </div>
+        <div class="detail-item">
+          <label>Loại xe</label>
+          <span>Giường nằm</span>
+        </div>
+        <div class="detail-item">
+          <label>Tổng thanh toán</label>
+          <span style="color: #2563eb">700.000₫</span>
+        </div>
+      </div>
+
+      <div class="seats-section">
+        <div class="seats-header">
+          <h3>Chỗ ngồi (2)</h3>
+        </div>
+        <div style="margin-top: 15px">
+          <div class="seat-badge">🪑 Ghế A3 (Tầng 1)</div>
+          <div class="seat-badge">🪑 Ghế A7 (Tầng 1)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticket-actions">
+      <form method="post" action="/TicketDetail" onsubmit="return confirm('Bạn chắc chắn muốn hủy vé này?')">
+        <input type="hidden" name="action" value="cancel">
+        <input type="hidden" name="maDon" value="DV001">
+        <button type="submit" class="btn btn-outline" style="color: #ef4444; border-color: #fca5a5">Hủy vé</button>
+      </form>
+      <button class="btn btn-primary" onclick="document.getElementById('review-modal').style.display='block'">Viết đánh giá</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Review -->
+<div id="review-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Đánh giá chuyến đi</h3>
+    </div>
+    <form method="post" action="/TicketDetail">
+      <input type="hidden" name="action" value="review">
+      <input type="hidden" name="maDon" value="DV001">
+      <input type="hidden" name="maChuyen" value="CX001">
+      <input type="hidden" name="rating" id="rating-val" value="5">
+
+      <div class="star-rating" id="stars">
+        <span data-val="1" class="active">★</span>
+        <span data-val="2" class="active">★</span>
+        <span data-val="3" class="active">★</span>
+        <span data-val="4" class="active">★</span>
+        <span data-val="5" class="active">★</span>
+      </div>
+
+      <textarea name="comment" class="form-control" placeholder="Chia sẻ cảm nhận của bạn về chuyến đi..." rows="4" style="width: 100%; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px"></textarea>
+
+      <div style="display: flex; gap: 10px">
+        <button type="submit" class="btn btn-primary" style="flex: 1">Gửi đánh giá</button>
+        <button type="button" class="btn btn-outline" style="flex: 1" onclick="document.getElementById('review-modal').style.display='none'">Hủy</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="~/assets/js/app.js"></script>
+<script>
+  const stars = document.querySelectorAll('#stars span');
+  stars.forEach(s => {
+    s.onclick = () => {
+      const val = s.getAttribute('data-val');
+      document.getElementById('rating-val').value = val;
+      stars.forEach(st => {
+        if (st.getAttribute('data-val') <= val) st.classList.add('active');
+        else st.classList.remove('active');
+      });
+    };
+  });
+</script>
+</body>
+</html>
