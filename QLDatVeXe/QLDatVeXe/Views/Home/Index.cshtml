@@ -1,8 +1,372 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "BusGo — Đặt Vé Xe Online Nhanh Chóng & Tiện Lợi";
+    ViewData["Description"] = "Đặt vé xe online dễ dàng, nhanh chóng. Tìm kiếm hàng trăm tuyến xe, chọn ghế linh hoạt, thanh toán an toàn.";
+    ViewData["ActiveNav"] = "home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section PageCss {
+  <link rel="stylesheet" href="~/assets/css/home.css" asp-append-version="true" />
+  <style>
+    /* Premium Trip Card Redesign */
+    .trips-list { display: flex; flex-direction: column; gap: 20px; }
+
+    .premium-trip-card {
+      display: flex;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      color: inherit;
+    }
+    .premium-trip-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      border-color: var(--primary-light);
+    }
+    .ptc-image-wrap {
+      width: 260px; min-width: 260px;
+      position: relative; overflow: hidden; background: #f8fafc;
+    }
+    .ptc-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .premium-trip-card:hover .ptc-image-wrap img { transform: scale(1.08); }
+    .ptc-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+      color: white; padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;
+    }
+    .ptc-content { flex: 1; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .ptc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .ptc-carrier { color: var(--gray-500); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .ptc-carrier strong { color: var(--gray-900); font-size: 1rem; }
+    .ptc-main { display: flex; align-items: center; gap: 24px; margin-bottom: 20px; }
+    .ptc-time-box { text-align: center; min-width: 80px; }
+    .ptc-time { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); display: block; line-height: 1; }
+    .ptc-station { font-size: 0.85rem; color: var(--gray-500); margin-top: 4px; display: block; }
+    .ptc-route-visual { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+    .ptc-duration { font-size: 0.75rem; color: var(--gray-400); margin-bottom: 6px; }
+    .ptc-line-wrap { width: 100%; height: 2px; background: #e2e8f0; position: relative; }
+    .ptc-line-wrap::before, .ptc-line-wrap::after {
+      content: ''; position: absolute; top: -3px; width: 8px; height: 8px; border-radius: 50%;
+    }
+    .ptc-line-wrap::before { left: 0; background: var(--primary); }
+    .ptc-line-wrap::after { right: 0; background: var(--accent); }
+    .ptc-bus-icon { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 8px; font-size: 1rem; }
+    .ptc-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px dashed #e2e8f0; }
+    .ptc-info-pills { display: flex; gap: 8px; }
+    .ptc-pill { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
+    .ptc-pill.success { background: #dcfce7; color: #166534; }
+    .ptc-price-wrap { text-align: right; }
+    .ptc-price { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: block; }
+    .ptc-price-label { font-size: 0.7rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Popular Destinations */
+    .dest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .dest-card {
+      position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 4/5;
+      cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      background: #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .dest-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 25px -5px rgba(0,0,0,0.15); }
+    .dest-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+    .dest-card:hover img { transform: scale(1.1); }
+    .dest-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.1) 60%, transparent 100%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 20px 16px; color: white; z-index: 2; transition: padding 0.4s ease;
+    }
+    .dest-card:hover .dest-overlay { padding-bottom: 24px; }
+    .dest-overlay h4 { font-size: 1.3rem; margin-bottom: 6px; font-weight: 800; letter-spacing: -0.01em; transform: translateY(6px); transition: transform 0.4s ease; }
+    .dest-card:hover .dest-overlay h4 { transform: translateY(0); }
+    .dest-overlay p { font-size: 0.8rem; font-weight: 600; color: #fbbf24; opacity: 0; transform: translateY(8px); transition: all 0.4s ease 0.1s; }
+    .dest-card:hover .dest-overlay p { opacity: 1; transform: translateY(0); }
+
+    @@media (max-width: 768px) {
+      .premium-trip-card { flex-direction: column; }
+      .ptc-image-wrap { width: 100%; height: 200px; }
+      .ptc-top { flex-direction: column; gap: 8px; }
+      .dest-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-content">
+    <div class="hero-text">
+      <div class="hero-badge">🎉 Hơn 50 tuyến xe trên toàn quốc</div>
+      <h1>Đặt vé xe <span class="hero-highlight">dễ dàng</span>,<br/>đi lại thoải mái</h1>
+      <p>Tìm kiếm &amp; đặt vé xe theo tỉnh thành, chọn ghế linh hoạt,<br/>thanh toán an toàn — chỉ trong vài bước đơn giản.</p>
+    </div>
+
+    <div class="search-card">
+      <h3 style="margin-bottom:20px;color:var(--gray-800)">🔍 Tìm chuyến xe</h3>
+      <form class="search-form" method="get" action="/Search" onsubmit="return validateSearchForm(this)">
+        <div class="search-row">
+          <div class="form-group">
+            <label class="form-label">📍 Tỉnh đi</label>
+            <select class="form-control" name="maTinhDi" id="select-tinh-di">
+              <option value="">-- Tất cả các tỉnh --</option>
+              <option value="HN">Hà Nội</option>
+              <option value="HCM">TP. Hồ Chí Minh</option>
+              <option value="DN">Đà Nẵng</option>
+              <option value="HP">Hải Phòng</option>
+              <option value="CT">Cần Thơ</option>
+            </select>
+          </div>
+          <button type="button" class="swap-btn" id="swap-btn" title="Đổi chiều" onclick="swapStations()">⇄</button>
+          <div class="form-group">
+            <label class="form-label">📍 Tỉnh đến</label>
+            <select class="form-control" name="maTinhDen" id="select-tinh-den">
+              <option value="">-- Tất cả các tỉnh --</option>
+              <option value="HN">Hà Nội</option>
+              <option value="HCM">TP. Hồ Chí Minh</option>
+              <option value="DN">Đà Nẵng</option>
+              <option value="HP">Hải Phòng</option>
+              <option value="CT">Cần Thơ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📅 Ngày đi</label>
+            <input type="date" class="form-control" name="ngayDi" id="input-ngay-di" required />
+          </div>
+          <button type="submit" class="btn btn-accent btn-lg search-btn" id="btn-search">
+            🔍 Tìm chuyến
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f9fafb"/></svg>
+  </div>
+</section>
+
+<!-- POPULAR DESTINATIONS -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>🌏 Điểm đến phổ biến</h2>
+      <p>Click để xem toàn bộ chuyến đi đến các địa danh hấp dẫn</p>
+    </div>
+    <div class="dest-grid">
+      <div class="dest-card" onclick="quickSearch('HCM')">
+        <img src="~/assets/img/1.jpg" alt="TP. Hồ Chí Minh" />
+        <div class="dest-overlay">
+          <h4>TP. Hồ Chí Minh</h4>
+          <p>Xem tất cả chuyến đến đây →</p>
+        </div>
+      </div>
+      <div class="dest-card" onclick="quickSearch('HN')">
+        <img src="~/assets/img/2.jpg" alt="Hà Nội" />
+        <div class="dest-overlay">
+          <h4>Hà Nội</h4>
+          <p>Xem tất cả chuyến đến đây →</p>
+        </div>
+      </div>
+      <div class="dest-card" onclick="quickSearch('DN')">
+        <img src="~/assets/img/3.jpg" alt="Đà Nẵng" />
+        <div class="dest-overlay">
+          <h4>Đà Nẵng</h4>
+          <p>Xem tất cả chuyến đến đây →</p>
+        </div>
+      </div>
+      <div class="dest-card" onclick="quickSearch('HP')">
+        <img src="~/assets/img/4.jpg" alt="Hải Phòng" />
+        <div class="dest-overlay">
+          <h4>Hải Phòng</h4>
+          <p>Xem tất cả chuyến đến đây →</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHUYẾN SẮP KHỞI HÀNH -->
+<section class="section section-gray" id="featured-trips">
+  <div class="container">
+    <div class="section-title">
+      <h2>🚌 Chuyến xe sắp khởi hành</h2>
+      <p>Khám phá các hành trình chất lượng cao sắp khởi hành</p>
+    </div>
+    <div class="trips-list" id="featured-trips-list">
+      <!-- Card mẫu 1 -->
+      <a href="/Booking?maChuyen=CX001" class="premium-trip-card">
+        <div class="ptc-image-wrap">
+          <img src="~/assets/img/x1.jpg" alt="Xe giường nằm" onerror="this.src='~/assets/img/bus-default.jpg'" />
+          <div class="ptc-badge">Giường nằm</div>
+        </div>
+        <div class="ptc-content">
+          <div class="ptc-top">
+            <div class="ptc-carrier">
+              <span>🏢 Nhà xe</span>
+              <strong>Phương Trang</strong>
+            </div>
+            <div class="ptc-info-pills">
+              <span class="ptc-pill success">Còn 12 ghế</span>
+              <span class="ptc-pill">27/05/2026</span>
+            </div>
+          </div>
+          <div class="ptc-main">
+            <div class="ptc-time-box">
+              <span class="ptc-time">07:00</span>
+              <span class="ptc-station">Hà Nội</span>
+            </div>
+            <div class="ptc-route-visual">
+              <span class="ptc-duration">⏱ 14h</span>
+              <div class="ptc-line-wrap">
+                <div class="ptc-bus-icon">🚌</div>
+              </div>
+            </div>
+            <div class="ptc-time-box" style="text-align:right">
+              <span class="ptc-time">21:00</span>
+              <span class="ptc-station">TP. HCM</span>
+            </div>
+          </div>
+          <div class="ptc-bottom">
+            <div style="font-size: 0.85rem; color: var(--gray-500)">
+              📍 Bến Mỹ Đình → Bến Miền Đông
+            </div>
+            <div class="ptc-price-wrap">
+              <span class="ptc-price-label">Chỉ từ</span>
+              <span class="ptc-price">350.000₫</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card mẫu 2 -->
+      <a href="/Booking?maChuyen=CX002" class="premium-trip-card">
+        <div class="ptc-image-wrap">
+          <img src="~/assets/img/x2.jpg" alt="Limousine" onerror="this.src='~/assets/img/bus-default.jpg'" />
+          <div class="ptc-badge">Limousine VIP</div>
+        </div>
+        <div class="ptc-content">
+          <div class="ptc-top">
+            <div class="ptc-carrier">
+              <span>🏢 Nhà xe</span>
+              <strong>Thành Bưởi</strong>
+            </div>
+            <div class="ptc-info-pills">
+              <span class="ptc-pill success">Còn 5 ghế</span>
+              <span class="ptc-pill">27/05/2026</span>
+            </div>
+          </div>
+          <div class="ptc-main">
+            <div class="ptc-time-box">
+              <span class="ptc-time">08:30</span>
+              <span class="ptc-station">TP. HCM</span>
+            </div>
+            <div class="ptc-route-visual">
+              <span class="ptc-duration">⏱ 4h 30m</span>
+              <div class="ptc-line-wrap">
+                <div class="ptc-bus-icon">🚌</div>
+              </div>
+            </div>
+            <div class="ptc-time-box" style="text-align:right">
+              <span class="ptc-time">13:00</span>
+              <span class="ptc-station">Đà Lạt</span>
+            </div>
+          </div>
+          <div class="ptc-bottom">
+            <div style="font-size: 0.85rem; color: var(--gray-500)">
+              📍 Bến Miền Đông → Bến Đà Lạt
+            </div>
+            <div class="ptc-price-wrap">
+              <span class="ptc-price-label">Chỉ từ</span>
+              <span class="ptc-price">180.000₫</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card mẫu 3 -->
+      <a href="/Booking?maChuyen=CX003" class="premium-trip-card">
+        <div class="ptc-image-wrap">
+          <img src="~/assets/img/x3.jpg" alt="Xe 2 tầng" onerror="this.src='~/assets/img/bus-default.jpg'" />
+          <div class="ptc-badge">Xe 2 tầng</div>
+        </div>
+        <div class="ptc-content">
+          <div class="ptc-top">
+            <div class="ptc-carrier">
+              <span>🏢 Nhà xe</span>
+              <strong>Hoàng Long</strong>
+            </div>
+            <div class="ptc-info-pills">
+              <span class="ptc-pill success">Còn 20 ghế</span>
+              <span class="ptc-pill">27/05/2026</span>
+            </div>
+          </div>
+          <div class="ptc-main">
+            <div class="ptc-time-box">
+              <span class="ptc-time">06:00</span>
+              <span class="ptc-station">Đà Nẵng</span>
+            </div>
+            <div class="ptc-route-visual">
+              <span class="ptc-duration">⏱ 3h</span>
+              <div class="ptc-line-wrap">
+                <div class="ptc-bus-icon">🚌</div>
+              </div>
+            </div>
+            <div class="ptc-time-box" style="text-align:right">
+              <span class="ptc-time">09:00</span>
+              <span class="ptc-station">Hội An</span>
+            </div>
+          </div>
+          <div class="ptc-bottom">
+            <div style="font-size: 0.85rem; color: var(--gray-500)">
+              📍 Bến Đà Nẵng → Bến Hội An
+            </div>
+            <div class="ptc-price-wrap">
+              <span class="ptc-price-label">Chỉ từ</span>
+              <span class="ptc-price">120.000₫</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:48px">
+      <a href="/Search" class="btn btn-outline btn-lg" style="padding: 12px 40px; border-radius: 99px">Xem tất cả chuyến xe →</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="section why-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Tại sao chọn BusGo?</h2>
+      <p>Chúng tôi mang đến trải nghiệm đặt vé tốt nhất</p>
+    </div>
+    <div class="grid-3">
+      <div class="why-card"><div class="why-icon">⚡</div><h3>Đặt vé nhanh chóng</h3><p>Chỉ cần chọn tỉnh đi, tỉnh đến, ngày đi — đặt vé xong trong dưới 2 phút.</p></div>
+      <div class="why-card"><div class="why-icon">🪑</div><h3>Chọn ghế linh hoạt</h3><p>Xem sơ đồ ghế theo tầng, chọn vị trí yêu thích trực tiếp trên màn hình.</p></div>
+      <div class="why-card"><div class="why-icon">💳</div><h3>Thanh toán an toàn</h3><p>Hỗ trợ tiền mặt và chuyển khoản, giao dịch được bảo mật tuyệt đối.</p></div>
+    </div>
+  </div>
+</section>
+
+@section Scripts {
+  <script>
+    const dateInput = document.getElementById('input-ngay-di');
+    if (dateInput) {
+      const today = new Date();
+      dateInput.valueAsDate = today;
+      dateInput.min = today.toISOString().split('T')[0];
+    }
+    function swapStations() {
+      const a = document.getElementById('select-tinh-di');
+      const b = document.getElementById('select-tinh-den');
+      const tmp = a.value; a.value = b.value; b.value = tmp;
+    }
+    function quickSearch(maTinh) {
+      const today = new Date().toISOString().split('T')[0];
+      window.location.href = '/Search?maTinhDen=' + maTinh + '&ngayDi=' + today;
+    }
+  </script>
+}

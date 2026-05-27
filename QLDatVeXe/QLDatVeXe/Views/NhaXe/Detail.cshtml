@@ -1,0 +1,209 @@
+@{
+    ViewData["Title"] = "Phương Trang — Nhà xe BusGo";
+    ViewData["ActiveNav"] = "nhaxe";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section PageCss {
+  <style>
+    .nhaxe-detail-hero { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #7c3aed 100%); color: white; padding: 48px 0 36px; }
+    .nhaxe-back-link { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,.8); font-size: .88rem; text-decoration: none; margin-bottom: 20px; transition: color .2s; }
+    .nhaxe-back-link:hover { color: white; }
+    .nhaxe-header-inner { display: flex; align-items: center; gap: 24px; }
+    .nhaxe-logo-big { width: 72px; height: 72px; background: rgba(255,255,255,.15); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; backdrop-filter: blur(8px); flex-shrink: 0; }
+    .nhaxe-title-block h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+    .nhaxe-meta-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+    .nhaxe-meta-item { display: flex; align-items: center; gap: 6px; font-size: .88rem; opacity: .9; }
+    .xe-section { padding: 32px 0 60px; }
+    .xe-section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .xe-section-title h2 { font-size: 1.3rem; font-weight: 700; }
+    .xe-count-badge { background: var(--primary); color: white; border-radius: 99px; padding: 2px 12px; font-size: .82rem; font-weight: 600; }
+    .xe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .xe-card { background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; transition: all .25s ease; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .xe-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(37,99,235,.1); border-color: #c7d2fe; }
+    .xe-img-wrap { height: 160px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .xe-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .xe-img-placeholder { font-size: 4rem; opacity: .4; }
+    .xe-status-badge { position: absolute; top: 10px; right: 10px; padding: 3px 10px; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .xe-status-SANSANG { background: #dcfce7; color: #166534; }
+    .xe-status-BAOTRI { background: #fef3c7; color: #92400e; }
+    .xe-status-DANGCHAY { background: #dbeafe; color: #1e40af; }
+    .xe-body { padding: 16px; }
+    .xe-bien-so { font-family: 'Courier New', monospace; font-weight: 700; font-size: 1rem; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; }
+    .xe-loai { font-weight: 600; font-size: .95rem; color: #334155; margin-bottom: 6px; }
+    .xe-meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .xe-chip { background: #f1f5f9; color: #64748b; border-radius: 99px; padding: 2px 10px; font-size: .77rem; }
+    .xe-stats-row { display: flex; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+    .xe-stat { flex: 1; text-align: center; border-right: 1px solid #f1f5f9; }
+    .xe-stat:last-child { border-right: none; }
+    .xe-stat-val { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+    .xe-stat-lbl { font-size: .72rem; color: var(--gray-400); }
+    @@media (max-width: 640px) { .nhaxe-header-inner { flex-direction: column; align-items: flex-start; } .xe-grid { grid-template-columns: 1fr; } }
+  </style>
+}
+
+<!-- HERO -->
+<div class="nhaxe-detail-hero">
+  <div class="container">
+    <a href="/NhaXe" class="nhaxe-back-link">← Quay lại danh sách nhà xe</a>
+    <div class="nhaxe-header-inner">
+      <div class="nhaxe-logo-big">🏢</div>
+      <div class="nhaxe-title-block">
+        <h1>Phương Trang</h1>
+        <span style="opacity:.7;font-size:.85rem">Mã: NX001</span>
+        <div class="nhaxe-meta-row">
+          <div class="nhaxe-meta-item">📞 1900 6067</div>
+          <div class="nhaxe-meta-item">✉️ phuongtrang@mail.vn</div>
+          <div class="nhaxe-meta-item">📍 123 Lê Lợi, Quận 1, TP. HCM</div>
+          <div class="nhaxe-meta-item">🚌 12 xe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- XE SECTION -->
+<div class="container xe-section">
+  <div class="xe-section-title">
+    <h2>🚌 Đội xe</h2>
+    <span class="xe-count-badge">4 xe</span>
+  </div>
+
+  <div class="xe-grid">
+    <!-- Xe 1 -->
+    <div class="xe-card" id="xe-51B12345">
+      <div class="xe-img-wrap">
+        <img src="~/assets/img/x1.jpg" alt="Giường nằm" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="xe-img-placeholder" style="display:none">🚌</div>
+        <div class="xe-status-badge xe-status-SANSANG">✅ Sẵn sàng</div>
+      </div>
+      <div class="xe-body">
+        <div class="xe-bien-so">51B-12345</div>
+        <div class="xe-loai">Giường nằm cao cấp</div>
+        <div class="xe-meta-row">
+          <span class="xe-chip">🏭 Hyundai</span>
+          <span class="xe-chip">📅 2022</span>
+          <span class="xe-chip">🏢 2 tầng</span>
+        </div>
+        <div class="xe-stats-row" style="margin-bottom: 12px;">
+          <div class="xe-stat"><div class="xe-stat-val">40</div><div class="xe-stat-lbl">Số ghế</div></div>
+          <div class="xe-stat"><div class="xe-stat-val">2</div><div class="xe-stat-lbl">Tầng</div></div>
+          <div class="xe-stat"><div class="xe-stat-val" style="color:#10b981">3</div><div class="xe-stat-lbl">Chuyến đang mở</div></div>
+        </div>
+        <a href="/NhaXe/Xe?bienSo=51B12345" class="btn btn-outline btn-sm" style="display:block; text-align:center; text-decoration:none;">Chi tiết &amp; Chuyến đi</a>
+      </div>
+    </div>
+
+    <!-- Xe 2 -->
+    <div class="xe-card" id="xe-51C67890">
+      <div class="xe-img-wrap">
+        <img src="~/assets/img/x2.jpg" alt="Limousine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="xe-img-placeholder" style="display:none">🚌</div>
+        <div class="xe-status-badge xe-status-DANGCHAY">🚀 Đang chạy</div>
+      </div>
+      <div class="xe-body">
+        <div class="xe-bien-so">51C-67890</div>
+        <div class="xe-loai">Limousine VIP</div>
+        <div class="xe-meta-row">
+          <span class="xe-chip">🏭 Thaco</span>
+          <span class="xe-chip">📅 2023</span>
+          <span class="xe-chip">🚌 1 tầng</span>
+        </div>
+        <div class="xe-stats-row" style="margin-bottom: 12px;">
+          <div class="xe-stat"><div class="xe-stat-val">20</div><div class="xe-stat-lbl">Số ghế</div></div>
+          <div class="xe-stat"><div class="xe-stat-val">1</div><div class="xe-stat-lbl">Tầng</div></div>
+          <div class="xe-stat"><div class="xe-stat-val" style="color:#10b981">2</div><div class="xe-stat-lbl">Chuyến đang mở</div></div>
+        </div>
+        <a href="/NhaXe/Xe?bienSo=51C67890" class="btn btn-outline btn-sm" style="display:block; text-align:center; text-decoration:none;">Chi tiết &amp; Chuyến đi</a>
+      </div>
+    </div>
+
+    <!-- Xe 3 -->
+    <div class="xe-card" id="xe-51D11111">
+      <div class="xe-img-wrap">
+        <img src="~/assets/img/x3.jpg" alt="Xe 2 tầng" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="xe-img-placeholder" style="display:none">🚌</div>
+        <div class="xe-status-badge xe-status-BAOTRI">🔧 Bảo trì</div>
+      </div>
+      <div class="xe-body">
+        <div class="xe-bien-so">51D-11111</div>
+        <div class="xe-loai">Xe 2 tầng thường</div>
+        <div class="xe-meta-row">
+          <span class="xe-chip">🏭 Isuzu</span>
+          <span class="xe-chip">📅 2020</span>
+          <span class="xe-chip">🏢 2 tầng</span>
+        </div>
+        <div class="xe-stats-row" style="margin-bottom: 12px;">
+          <div class="xe-stat"><div class="xe-stat-val">45</div><div class="xe-stat-lbl">Số ghế</div></div>
+          <div class="xe-stat"><div class="xe-stat-val">2</div><div class="xe-stat-lbl">Tầng</div></div>
+          <div class="xe-stat"><div class="xe-stat-val" style="color:#94a3b8">0</div><div class="xe-stat-lbl">Chuyến đang mở</div></div>
+        </div>
+        <a href="/NhaXe/Xe?bienSo=51D11111" class="btn btn-outline btn-sm" style="display:block; text-align:center; text-decoration:none;">Chi tiết &amp; Chuyến đi</a>
+      </div>
+    </div>
+
+    <!-- Xe 4 -->
+    <div class="xe-card" id="xe-51E22222">
+      <div class="xe-img-wrap">
+        <img src="~/assets/img/x4.jpg" alt="Ghế ngồi" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="xe-img-placeholder" style="display:none">🚌</div>
+        <div class="xe-status-badge xe-status-SANSANG">✅ Sẵn sàng</div>
+      </div>
+      <div class="xe-body">
+        <div class="xe-bien-so">51E-22222</div>
+        <div class="xe-loai">Ghế ngồi tiêu chuẩn</div>
+        <div class="xe-meta-row">
+          <span class="xe-chip">🏭 Samco</span>
+          <span class="xe-chip">📅 2021</span>
+          <span class="xe-chip">🚌 1 tầng</span>
+        </div>
+        <div class="xe-stats-row" style="margin-bottom: 12px;">
+          <div class="xe-stat"><div class="xe-stat-val">45</div><div class="xe-stat-lbl">Số ghế</div></div>
+          <div class="xe-stat"><div class="xe-stat-val">1</div><div class="xe-stat-lbl">Tầng</div></div>
+          <div class="xe-stat"><div class="xe-stat-val" style="color:#10b981">5</div><div class="xe-stat-lbl">Chuyến đang mở</div></div>
+        </div>
+        <a href="/NhaXe/Xe?bienSo=51E22222" class="btn btn-outline btn-sm" style="display:block; text-align:center; text-decoration:none;">Chi tiết &amp; Chuyến đi</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS SECTION -->
+<div class="container" style="padding-bottom: 80px; max-width: 1000px; margin: 0 auto;">
+  <div class="xe-section-title">
+    <h2>💬 Tất cả bình luận về nhà xe</h2>
+    <span class="xe-count-badge">3 bình luận</span>
+  </div>
+  <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; padding:12px 24px; box-shadow: 0 4px 12px rgba(0,0,0,.03);">
+    <div style="border-bottom:1px solid #f1f5f9; padding:16px 0; display:flex; justify-content:space-between; align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <strong style="font-size:0.95rem; color:#1e293b;">👤 Nguyễn Văn A</strong>
+          <span style="color:#fbbf24; font-size:0.9rem;">★★★★★</span>
+        </div>
+        <div style="font-size:0.92rem; color:#334155; line-height:1.5; margin-bottom:8px;">Xe rất sạch, tài xế lái an toàn, đúng giờ. Rất hài lòng!</div>
+        <div style="font-size:0.78rem; color:#94a3b8;">Ngày: 15/05/2026</div>
+      </div>
+    </div>
+    <div style="border-bottom:1px solid #f1f5f9; padding:16px 0; display:flex; justify-content:space-between; align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <strong style="font-size:0.95rem; color:#1e293b;">👤 Trần Thị B</strong>
+          <span style="color:#fbbf24; font-size:0.9rem;">★★★★☆</span>
+        </div>
+        <div style="font-size:0.92rem; color:#334155; line-height:1.5; margin-bottom:8px;">Dịch vụ tốt, nhân viên thân thiện. Sẽ đặt lại.</div>
+        <div style="font-size:0.78rem; color:#94a3b8;">Ngày: 10/05/2026</div>
+      </div>
+    </div>
+    <div style="padding:16px 0; display:flex; justify-content:space-between; align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <strong style="font-size:0.95rem; color:#1e293b;">👤 Lê Văn C</strong>
+          <span style="color:#fbbf24; font-size:0.9rem;">★★★☆☆</span>
+        </div>
+        <div style="font-size:0.92rem; color:#334155; line-height:1.5; margin-bottom:8px;">Xe hơi trễ 20 phút nhưng tài xế đã xin lỗi và bù đắp.</div>
+        <div style="font-size:0.78rem; color:#94a3b8;">Ngày: 05/05/2026</div>
+      </div>
+    </div>
+  </div>
+</div>

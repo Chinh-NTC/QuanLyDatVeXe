@@ -1,0 +1,189 @@
+@{
+    ViewData["Title"] = "Chọn ghế — BusGo";
+    ViewData["ActiveNav"] = "search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section PageCss {
+  <link rel="stylesheet" href="~/assets/css/booking.css" asp-append-version="true" />
+  <style>
+    .bus-container { background: #f8fafc; padding: 40px 20px; border-radius: 24px; border: 1px solid #e2e8f0; max-width: 420px; margin: 0 auto; position: relative; }
+    .bus-body { background: white; border: 3px solid #cbd5e1; border-radius: 40px 40px 10px 10px; padding: 30px 20px; position: relative; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .bus-front-cabin { display: flex; justify-content: space-between; align-items: center; padding-bottom: 25px; margin-bottom: 25px; border-bottom: 2px dashed #e2e8f0; }
+    .steering-wheel { width: 40px; height: 40px; border: 4px solid #64748b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #64748b; }
+    .driver-seat { width: 44px; height: 44px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.8rem; }
+    .seat-grid-bus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; justify-items: center; }
+    .seat-grid-bus .seat:nth-child(4n-2) { margin-right: 30px; }
+    .floor-indicator { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 4px 16px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  </style>
+}
+
+<div class="steps-bar">
+  <div class="container">
+    <div class="steps">
+      <div class="step done"><span class="step-num">1</span><span class="step-label">Tìm chuyến</span></div>
+      <div class="step-line done"></div>
+      <div class="step active"><span class="step-num">2</span><span class="step-label">Chọn ghế</span></div>
+      <div class="step-line"></div>
+      <div class="step"><span class="step-num">3</span><span class="step-label">Thanh toán</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="container booking-layout" style="padding-top:32px;padding-bottom:60px">
+  <div class="booking-main">
+    <!-- Trip Info Card - Premium -->
+    <div class="card card-body mb-24" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; border: none; box-shadow: 0 10px 25px -5px rgba(59,130,246,0.4); padding: 24px 32px; border-radius: 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+        <div style="display:flex; align-items:center; gap:24px; flex: 1; min-width: 250px;">
+          <div style="text-align:center;">
+            <div style="font-size:2rem; font-weight:800; line-height:1;">07:00</div>
+            <div style="font-size:0.9rem; opacity:0.9; margin-top:8px; font-weight:500;">Bến Mỹ Đình</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex: 1;">
+            <span style="font-size:0.8rem; opacity:0.9; font-weight:600;">840 phút</span>
+            <div style="width:100%; height:2px; background:rgba(255,255,255,0.4); position:relative; margin:8px 0; border-radius:2px;">
+              <div style="position:absolute; right:50%; top:-10px; transform:translateX(50%); font-size:18px;">🚌</div>
+            </div>
+            <span style="font-size:0.75rem; opacity:0.8; letter-spacing: 1px; text-transform: uppercase;">Chạy thẳng</span>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:2rem; font-weight:800; line-height:1;">21:00</div>
+            <div style="font-size:0.9rem; opacity:0.9; margin-top:8px; font-weight:500;">Bến Miền Đông</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:32px; border-left:1px solid rgba(255,255,255,0.2); padding-left:32px;">
+          <div>
+            <div style="font-size:0.75rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Ngày đi</div>
+            <div style="font-weight:700; font-size:1.15rem;">27/05/2026</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Nhà xe</div>
+            <div style="font-weight:700; font-size:1.15rem;">Phương Trang</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Loại xe</div>
+            <div style="font-weight:700; font-size:1.0rem; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:6px;">Giường nằm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEAT MAP -->
+    <div class="card card-body">
+      <div class="seat-map-header">
+        <h3>🪑 Sơ đồ ghế</h3>
+        <div class="seat-legend">
+          <div class="legend-item"><div class="seat-demo trong"></div>Trống</div>
+          <div class="legend-item"><div class="seat-demo dadat"></div>Đã đặt</div>
+          <div class="legend-item"><div class="seat-demo selected"></div>Đang chọn</div>
+        </div>
+      </div>
+
+      <div class="floor-tabs">
+        <div class="floor-tab active" onclick="showFloor(1, this)">Tầng 1</div>
+        <div class="floor-tab" onclick="showFloor(2, this)">Tầng 2</div>
+      </div>
+
+      <div class="bus-container">
+        <!-- TẦNG 1 -->
+        <div id="floor-1" class="bus-floor">
+          <div class="bus-body">
+            <div class="floor-indicator">TẦNG 1</div>
+            <div class="bus-front-cabin">
+              <div class="steering-wheel">⚙️</div>
+              <div class="driver-seat">Tài xế</div>
+            </div>
+            <div class="seat-grid-bus">
+              @for (int i = 1; i <= 20; i++) {
+                string status = (i % 5 == 0) ? "dadat" : "trong";
+                string onclick = (status == "trong") ? $"onclick=\"toggleSeat('G1-{i:D2}','A{i}')\"" : "";
+                <div class="seat @status" id="seat-G1-@i" data-id="G1-@i.ToString("D2")" data-so="A@i" @Html.Raw(onclick)>A@i</div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- TẦNG 2 -->
+        <div id="floor-2" class="bus-floor" style="display:none">
+          <div class="bus-body">
+            <div class="floor-indicator">TẦNG 2</div>
+            <div class="bus-front-cabin">
+              <div style="width:40px"></div>
+              <div class="driver-seat">Trống</div>
+            </div>
+            <div class="seat-grid-bus">
+              @for (int i = 1; i <= 20; i++) {
+                string status = (i % 7 == 0) ? "dadat" : "trong";
+                string onclick = (status == "trong") ? $"onclick=\"toggleSeat('G2-{i:D2}','B{i}')\"" : "";
+                <div class="seat @status" id="seat-G2-@i" data-id="G2-@i.ToString("D2")" data-so="B@i" @Html.Raw(onclick)>B@i</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seat-selection-info" id="seat-selection-info" style="display:none">
+        <span>Ghế đang chọn:</span>
+        <div class="selected-tags" id="selected-tags"></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSeats()">Xóa chọn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="booking-sidebar">
+    <!-- Passenger Info -->
+    <div class="card card-body mb-24">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3>👤 Hành khách</h3>
+        <a href="/Account?tab=profile" style="font-size:.8rem; color:var(--primary); text-decoration:underline;">Chỉnh sửa</a>
+      </div>
+      <div class="form-group mb-16">
+        <label class="form-label">Họ tên</label>
+        <input type="text" class="form-control" id="input-hoten" value="Nguyễn Văn A" readonly style="background:#f1f5f9; cursor:not-allowed;" />
+      </div>
+      <div class="form-group mb-16">
+        <label class="form-label">Số điện thoại</label>
+        <input type="text" class="form-control" id="input-sdt" value="0912345678" readonly style="background:#f1f5f9; cursor:not-allowed;" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú (nếu có)</label>
+        <textarea class="form-control" id="input-ghichu" rows="2" placeholder="Ví dụ: Đón tại ngã tư..." style="resize: none;"></textarea>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card card-body" style="padding:24px;">
+      <h3 class="mb-20">📋 Tổng kết</h3>
+      <div class="summary-row" style="margin-bottom:12px;"><span>Nhà xe</span><strong>Phương Trang</strong></div>
+      <div class="summary-row" style="margin-bottom:12px;"><span>Tuyến</span><strong>Hà Nội → TP. HCM</strong></div>
+      <div class="summary-row" style="margin-bottom:8px;"><span>Ghế chọn</span><strong id="sum-seat-count">0 ghế</strong></div>
+      <div id="sum-seat-names" style="font-size:0.85rem; color:var(--gray-500); text-align:right; margin-bottom:16px; min-height:20px;"></div>
+      
+      <div class="divider" style="margin:16px 0;"></div>
+      <div class="summary-row total-row" style="margin-bottom:20px;">
+        <span>Tổng tiền</span>
+        <strong id="sum-total" class="price-tag">0₫</strong>
+      </div>
+      
+      <button class="btn btn-primary btn-block btn-lg mt-20" id="btn-book" disabled onclick="proceedToPayment()">
+        Xác nhận đặt vé →
+      </button>
+    </div>
+  </aside>
+</div>
+
+@section Scripts {
+  <script>
+    window.TRIP_DATA = { maChuyen: "CX001", giaVe: 350000 };
+    window.CTX = '';
+    function showFloor(floor, btn) {
+      document.querySelectorAll('.bus-floor').forEach(f => f.style.display = 'none');
+      document.getElementById('floor-' + floor).style.display = 'block';
+      document.querySelectorAll('.floor-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+  <script src="~/assets/js/booking.js" asp-append-version="true"></script>
+}

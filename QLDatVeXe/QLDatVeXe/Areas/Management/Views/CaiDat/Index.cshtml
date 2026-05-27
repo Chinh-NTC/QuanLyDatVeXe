@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Cài đặt hệ thống";
+    ViewData["AdminNav"] = "caidat";
+    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+  <div>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b;">⚙️ Cài đặt hệ thống</h2>
+    <p style="color:#64748b;font-size:0.88rem;margin-top:4px;">Cấu hình chung cho hệ thống đặt vé</p>
+  </div>
+  <button style="background:#3b82f6;color:white;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;">💾 Lưu cài đặt</button>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr;gap:24px;max-width:800px;">
+  <!-- Thông tin website -->
+  <div style="background:white;border-radius:16px;border:1px solid #f1f5f9;padding:24px;">
+    <h3 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:20px;">🌐 Thông tin website</h3>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Tên website</label>
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="BusGo" />
+      </div>
+      <div>
+        <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Hotline hỗ trợ</label>
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="1900 1234" />
+      </div>
+      <div>
+        <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Email hỗ trợ</label>
+        <input type="email" class="form-control" style="width:100%;max-width:400px;" value="support@busgo.vn" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Cấu hình thanh toán -->
+  <div style="background:white;border-radius:16px;border:1px solid #f1f5f9;padding:24px;">
+    <h3 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:20px;">💳 Cấu hình thanh toán</h3>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Tài khoản ngân hàng nhận tiền</label>
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="Vietcombank - 0123456789 - CÔNG TY BUSGO" />
+      </div>
+      <div>
+        <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Thời gian giữ ghế (chờ thanh toán)</label>
+        <select class="form-control" style="width:100%;max-width:200px;">
+          <option>5 phút</option>
+          <option selected>10 phút</option>
+          <option>15 phút</option>
+          <option>30 phút</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thông báo -->
+  <div style="background:white;border-radius:16px;border:1px solid #f1f5f9;padding:24px;">
+    <h3 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:20px;">🔔 Cấu hình thông báo</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" checked style="width:18px;height:18px;accent-color:#3b82f6;" />
+        <span style="font-size:0.9rem;color:#1e293b;font-weight:500;">Gửi email xác nhận đặt vé thành công cho khách hàng</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" checked style="width:18px;height:18px;accent-color:#3b82f6;" />
+        <span style="font-size:0.9rem;color:#1e293b;font-weight:500;">Gửi SMS nhắc nhở trước giờ khởi hành 2 tiếng</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <input type="checkbox" checked style="width:18px;height:18px;accent-color:#3b82f6;" />
+        <span style="font-size:0.9rem;color:#1e293b;font-weight:500;">Gửi thông báo cho Admin khi có đơn hàng mới</span>
+      </label>
+    </div>
+  </div>
+</div>

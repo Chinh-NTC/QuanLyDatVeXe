@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Quản lý Chuyến xe";
+    ViewData["AdminNav"] = "chuyenxe";
+    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+  <div>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b;">🚌 Danh sách Chuyến xe</h2>
+    <p style="color:#64748b;font-size:0.88rem;margin-top:4px;">Quản lý tất cả chuyến xe trong hệ thống</p>
+  </div>
+  <button class="admin-topbar-btn" style="background:#3b82f6;color:white;border-color:#3b82f6;">+ Thêm chuyến mới</button>
+</div>
+
+<!-- FILTER BAR -->
+<div style="background:white;border-radius:12px;padding:16px 20px;border:1px solid #f1f5f9;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+  <select class="form-control" style="width:auto;min-width:140px;">
+    <option>Tất cả trạng thái</option>
+    <option>Đang mở bán</option>
+    <option>Đã khởi hành</option>
+    <option>Hoàn thành</option>
+    <option>Đã hủy</option>
+  </select>
+  <input type="date" class="form-control" style="width:auto;" />
+  <input type="text" class="form-control" style="flex:1;min-width:200px;" placeholder="🔍 Tìm theo tuyến, mã chuyến..." />
+  <button class="admin-topbar-btn">Lọc</button>
+</div>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Mã chuyến</th>
+        <th>Tuyến đường</th>
+        <th>Giờ khởi hành</th>
+        <th>Ngày đi</th>
+        <th>Nhà xe</th>
+        <th>Ghế còn</th>
+        <th>Giá vé</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CX001</strong></td>
+        <td>Hà Nội → TP. HCM</td>
+        <td>07:00 → 21:00</td>
+        <td>27/05/2026</td>
+        <td>Phương Trang</td>
+        <td><span class="badge badge-success">12 ghế</span></td>
+        <td><strong>350.000₫</strong></td>
+        <td><span class="badge badge-info">Đang mở bán</span></td>
+        <td>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>CX002</strong></td>
+        <td>TP. HCM → Đà Lạt</td>
+        <td>08:30 → 13:00</td>
+        <td>27/05/2026</td>
+        <td>Thành Bưởi</td>
+        <td><span class="badge badge-warning">5 ghế</span></td>
+        <td><strong>180.000₫</strong></td>
+        <td><span class="badge badge-info">Đang mở bán</span></td>
+        <td>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>CX003</strong></td>
+        <td>Đà Nẵng → Hội An</td>
+        <td>06:00 → 09:00</td>
+        <td>27/05/2026</td>
+        <td>Hoàng Long</td>
+        <td><span class="badge badge-success">20 ghế</span></td>
+        <td><strong>120.000₫</strong></td>
+        <td><span class="badge badge-gray">Hoàn thành</span></td>
+        <td>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Xem</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>CX004</strong></td>
+        <td>Hà Nội → Vinh</td>
+        <td>14:00 → 22:00</td>
+        <td>27/05/2026</td>
+        <td>Kumho Samco</td>
+        <td><span class="badge badge-warning">8 ghế</span></td>
+        <td><strong>220.000₫</strong></td>
+        <td><span class="badge badge-info">Đang mở bán</span></td>
+        <td>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
+          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
