@@ -1,0 +1,121 @@
+@{
+    var nx       = ViewBag.NhaXe   as QLDatVeXe.Models.Nhaxe;
+    var danhGias = ViewBag.DanhGias as List<QLDatVeXe.Models.Danhgia> ?? new();
+    var diemTB   = (double)(ViewBag.DiemTB ?? 0.0);
+
+    ViewBag.Title    = $"Nhà xe: {nx?.TenNhaXe}";
+    ViewBag.PageName = "NhaXe";
+
+    if (nx is null) { <p>Không tìm thấy nhà xe.</p> return; }
+}
+
+<div style="margin-bottom:20px">
+    <a asp-action="Index" class="btn btn-ghost btn-sm">← Quay lại danh sách</a>
+</div>
+
+<!-- Header card -->
+<div class="panel" style="margin-bottom:20px">
+    <div class="panel-body" style="padding:28px;display:flex;gap:24px;align-items:flex-start">
+        <div class="nhaxe-logo-lg" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+            @(nx.TenNhaXe.Length > 0 ? nx.TenNhaXe[0].ToString().ToUpper() : "?")
+        </div>
+        <div style="flex:1">
+            <h2 style="margin:0 0 6px;font-size:1.4rem">@nx.TenNhaXe</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:.88rem;color:#475569;margin-bottom:16px">
+                @if (!string.IsNullOrEmpty(nx.Sdt))   { <span>📞 @nx.Sdt</span> }
+                @if (!string.IsNullOrEmpty(nx.Email))  { <span>✉️ @nx.Email</span> }
+                @if (!string.IsNullOrEmpty(nx.DiaChi)) { <span>📍 @nx.DiaChi</span> }
+            </div>
+            <div style="display:flex;gap:20px">
+                <div class="kpi-mini blue">
+                    <div class="kpi-mini-val">@nx.Xe.Count</div>
+                    <div class="kpi-mini-lbl">Tổng số xe</div>
+                </div>
+                <div class="kpi-mini green">
+                    <div class="kpi-mini-val">@nx.Xe.Sum(x => x.Chuyenxe.Count)</div>
+                    <div class="kpi-mini-lbl">Tổng chuyến</div>
+                </div>
+                <div class="kpi-mini yellow">
+                    <div class="kpi-mini-val">@diemTB.ToString("0.0") ⭐</div>
+                    <div class="kpi-mini-lbl">Đánh giá TB</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Danh sách xe -->
+<div class="panel" style="margin-bottom:20px">
+    <div class="panel-header">
+        <h3>🚌 Danh sách xe (@nx.Xe.Count)</h3>
+    </div>
+    <div class="panel-body table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Biển số</th>
+                    <th>Loại xe</th>
+                    <th>Hãng xe</th>
+                    <th>Năm SX</th>
+                    <th>Số tầng</th>
+                    <th>Số ghế</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var xe in nx.Xe)
+                {
+                    var (xeBadge, xeLabel) = xe.TrangThai switch {
+                        "SANSANG"   => ("badge-green",  "Sẵn sàng"),
+                        "DANGCHAY"  => ("badge-blue",   "Đang chạy"),
+                        "BAOTRI"    => ("badge-yellow",  "Bảo trì"),
+                        _           => ("badge-gray",   xe.TrangThai ?? "—")
+                    };
+                    <tr>
+                        <td><code>@xe.BienSo</code></td>
+                        <td>@(xe.LoaiXe ?? "—")</td>
+                        <td>@(xe.HangXe ?? "—")</td>
+                        <td>@(xe.NamSx?.ToString() ?? "—")</td>
+                        <td style="text-align:center">@(xe.SoTang ?? 1)</td>
+                        <td style="text-align:center"><span class="badge badge-blue">@xe.Ghe.Count ghế</span></td>
+                        <td><span class="badge @xeBadge">@xeLabel</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Đánh giá gần nhất -->
+@if (danhGias.Any())
+{
+    <div class="panel">
+        <div class="panel-header">
+            <h3>⭐ Đánh giá gần nhất (@danhGias.Count)</h3>
+        </div>
+        <div class="panel-body" style="padding:16px">
+            @foreach (var dg in danhGias)
+            {
+                <div class="review-row">
+                    <div class="review-avatar">
+                        @(dg.MaKhNavigation?.HoTen?.Length > 0 ? dg.MaKhNavigation.HoTen[0].ToString().ToUpper() : "?")
+                    </div>
+                    <div style="flex:1">
+                        <div style="font-weight:600">@(dg.MaKhNavigation?.HoTen ?? dg.MaKh)</div>
+                        <div style="font-size:.82rem;color:#94a3b8;margin-bottom:4px">
+                            @dg.NgayDanhGia?.ToString("dd/MM/yyyy HH:mm") — Chuyến @dg.MaChuyen
+                        </div>
+                        <div class="star-row">
+                            @for (int i = 1; i <= 5; i++)
+                            { <span style="color:@(i <= (dg.DiemDanhGia ?? 0) ? "#f59e0b" : "#e2e8f0")">★</span> }
+                        </div>
+                        @if (!string.IsNullOrEmpty(dg.BinhLuan))
+                        {
+                            <p style="margin:6px 0 0;font-size:.88rem;color:#475569">@dg.BinhLuan</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

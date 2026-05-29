@@ -1,108 +1,80 @@
 @{
-    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Quản lý Nhà xe";
-    ViewData["AdminNav"] = "nhaxe";
+    ViewBag.Title    = "Quản lý Nhà xe";
+    ViewBag.PageName = "NhaXe";
+
+    var nhaXes = ViewBag.NhaXes as List<QLDatVeXe.Models.Nhaxe> ?? new();
+    var search  = ViewBag.Search as string ?? "";
 }
 
-<!-- ===== Title Bar ===== -->
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
-    <div>
-        <h2 style="margin:0;font-size:1.55rem;font-weight:700;color:#1e293b;">🏢 Danh sách Nhà xe</h2>
-        <p style="margin:4px 0 0;font-size:.93rem;color:#64748b;">Quản lý thông tin nhà xe trong hệ thống</p>
+<!-- Toolbar -->
+<div class="toolbar">
+    <form method="get" class="toolbar-search">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" name="search" value="@search"
+                   placeholder="Tìm theo tên nhà xe, SĐT…"
+                   class="search-input" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+        @if (!string.IsNullOrEmpty(search))
+        {
+            <a href="@Url.Action("Index")" class="btn btn-ghost btn-sm">✕ Xóa</a>
+        }
+    </form>
+    <div class="toolbar-stats">
+        <span class="stat-badge">Tổng: <b>@nhaXes.Count</b> nhà xe</span>
     </div>
-    <a href="#" class="admin-topbar-btn" style="background:#3b82f6;color:white;border-color:#3b82f6;text-decoration:none;padding:9px 20px;border-radius:8px;font-weight:600;font-size:.93rem;display:inline-flex;align-items:center;gap:6px;">
-        + Thêm nhà xe
-    </a>
 </div>
 
-<!-- ===== Filter Bar ===== -->
-<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-    <input type="text" placeholder="Tìm theo tên, SĐT, email..." style="flex:1;min-width:220px;padding:9px 14px;border:1px solid #cbd5e1;border-radius:8px;font-size:.93rem;outline:none;transition:border .2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#cbd5e1'" />
-    <button class="admin-topbar-btn" style="background:#3b82f6;color:white;border-color:#3b82f6;padding:9px 22px;border-radius:8px;font-weight:600;font-size:.93rem;cursor:pointer;">
-        🔍 Lọc
-    </button>
-</div>
+<!-- Cards grid -->
+<div class="nhaxe-grid">
+    @foreach (var nx in nhaXes)
+    {
+        var tongXe     = nx.Xe.Count;
+        var tongChuyen = nx.Xe.Sum(x => x.Chuyenxe.Count);
+        var colors     = new[] { "#2563eb","#7c3aed","#059669","#d97706","#dc2626","#0891b2" };
+        var color      = colors[Math.Abs(nx.MaNhaXe.GetHashCode()) % colors.Length];
 
-<!-- ===== Data Table ===== -->
-<div class="admin-table-wrap">
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>Mã NX</th>
-                <th>Tên nhà xe</th>
-                <th>SĐT</th>
-                <th>Email</th>
-                <th>Địa chỉ</th>
-                <th>Số xe</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Row 1 — Phương Trang -->
-            <tr>
-                <td><strong>NX001</strong></td>
-                <td>Phương Trang</td>
-                <td>028 3833 8888</td>
-                <td>info@futabus.vn</td>
-                <td>272 Đề Thám, Q.1, TP.HCM</td>
-                <td style="text-align:center;font-weight:600;">12</td>
-                <td><span class="badge badge-success">Hoạt động</span></td>
-                <td>
-                    <div style="display:flex;gap:6px;">
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;">Sửa</a>
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;background:#ef4444;color:white;border-color:#ef4444;">Xóa</a>
+        <div class="nhaxe-card">
+            <div class="nhaxe-banner" style="background:@color">
+                <div class="nhaxe-logo-circle">
+                    @(nx.TenNhaXe.Length > 0 ? nx.TenNhaXe[0].ToString().ToUpper() : "?")
+                </div>
+            </div>
+            <div class="nhaxe-body">
+                <h3 class="nhaxe-name">@nx.TenNhaXe</h3>
+                <div class="nhaxe-meta">
+                    @if (!string.IsNullOrEmpty(nx.Sdt))
+                    { <span>📞 @nx.Sdt</span> }
+                    @if (!string.IsNullOrEmpty(nx.Email))
+                    { <span>✉️ @nx.Email</span> }
+                    @if (!string.IsNullOrEmpty(nx.DiaChi))
+                    { <span>📍 @nx.DiaChi</span> }
+                </div>
+                <div class="nhaxe-stats">
+                    <div class="nhaxe-stat">
+                        <div class="nhaxe-stat-val">@tongXe</div>
+                        <div class="nhaxe-stat-lbl">Xe</div>
                     </div>
-                </td>
-            </tr>
-            <!-- Row 2 — Thành Bưởi -->
-            <tr>
-                <td><strong>NX002</strong></td>
-                <td>Thành Bưởi</td>
-                <td>028 3839 0909</td>
-                <td>contact@thanhbuoi.vn</td>
-                <td>266 Lê Hồng Phong, Q.10, TP.HCM</td>
-                <td style="text-align:center;font-weight:600;">8</td>
-                <td><span class="badge badge-success">Hoạt động</span></td>
-                <td>
-                    <div style="display:flex;gap:6px;">
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;">Sửa</a>
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;background:#ef4444;color:white;border-color:#ef4444;">Xóa</a>
+                    <div class="nhaxe-divider"></div>
+                    <div class="nhaxe-stat">
+                        <div class="nhaxe-stat-val">@tongChuyen</div>
+                        <div class="nhaxe-stat-lbl">Chuyến</div>
                     </div>
-                </td>
-            </tr>
-            <!-- Row 3 — Hoàng Long -->
-            <tr>
-                <td><strong>NX003</strong></td>
-                <td>Hoàng Long</td>
-                <td>024 3928 2828</td>
-                <td>info@hoanglong.vn</td>
-                <td>28 Trần Nhật Duật, Hà Nội</td>
-                <td style="text-align:center;font-weight:600;">15</td>
-                <td><span class="badge badge-success">Hoạt động</span></td>
-                <td>
-                    <div style="display:flex;gap:6px;">
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;">Sửa</a>
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;background:#ef4444;color:white;border-color:#ef4444;">Xóa</a>
-                    </div>
-                </td>
-            </tr>
-            <!-- Row 4 — Kumho Samco -->
-            <tr>
-                <td><strong>NX004</strong></td>
-                <td>Kumho Samco</td>
-                <td>028 3846 6666</td>
-                <td>info@kumhosamco.vn</td>
-                <td>292 Đinh Bộ Lĩnh, Q.Bình Thạnh, TP.HCM</td>
-                <td style="text-align:center;font-weight:600;">10</td>
-                <td><span class="badge badge-success">Hoạt động</span></td>
-                <td>
-                    <div style="display:flex;gap:6px;">
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;">Sửa</a>
-                        <a href="#" class="admin-topbar-btn" style="padding:5px 14px;font-size:.85rem;border-radius:6px;text-decoration:none;background:#ef4444;color:white;border-color:#ef4444;">Xóa</a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+                <a asp-area="management" asp-controller="QuanLyNhaXe"
+                   asp-action="ChiTiet" asp-route-maNhaXe="@nx.MaNhaXe"
+                   class="btn btn-outline btn-sm btn-block-full">
+                    Xem chi tiết →
+                </a>
+            </div>
+        </div>
+    }
+    @if (!nhaXes.Any())
+    {
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8">
+            <div style="font-size:3rem;margin-bottom:12px">🏢</div>
+            <div>Không tìm thấy nhà xe nào.</div>
+        </div>
+    }
 </div>

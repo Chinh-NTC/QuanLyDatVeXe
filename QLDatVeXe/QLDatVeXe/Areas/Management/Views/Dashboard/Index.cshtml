@@ -1,95 +1,213 @@
 @{
-    ViewData["Title"] = "Dashboard";
-    ViewData["AdminNav"] = "dashboard";
-    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title    = "Dashboard — BusGo Quản lý";
+    ViewBag.PageName = "Dashboard";
+
+    var tongDon      = (int)(ViewBag.TongDon      ?? 0);
+    var donCho       = (int)(ViewBag.DonCho       ?? 0);
+    var donThanhCong = (int)(ViewBag.DonThanhCong ?? 0);
+    var donDaHuy     = (int)(ViewBag.DonDaHuy     ?? 0);
+    var chuyenSapDi  = (int)(ViewBag.ChuyenSapDi  ?? 0);
+    var tongKH       = (int)(ViewBag.TongKH       ?? 0);
+    var tongNhaXe    = (int)(ViewBag.TongNhaXe    ?? 0);
+    var tongDT       = (decimal)(ViewBag.TongDoanhThu ?? 0m);
+    var don8         = ViewBag.Don8GanNhat as List<QLDatVeXe.Models.Dondatve> ?? new();
+
+    var chartLabels  = ViewBag.ChartLabels  as string ?? "[]";
+    var chartData    = ViewBag.ChartData    as string ?? "[]";
+    var pieLabels    = ViewBag.PieLabels    as string ?? "[]";
+    var pieData      = ViewBag.PieData      as string ?? "[]";
 }
 
-<!-- STAT CARDS -->
-<div class="stat-cards">
-  <div class="stat-card">
-    <div class="stat-card-icon" style="background:#eff6ff;color:#3b82f6;">🎫</div>
-    <div class="stat-card-value">1,248</div>
-    <div class="stat-card-label">Tổng đơn hàng</div>
-    <div class="stat-card-trend trend-up">↑ 12% so với tháng trước</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-icon" style="background:#f0fdf4;color:#10b981;">💰</div>
-    <div class="stat-card-value">248M₫</div>
-    <div class="stat-card-label">Doanh thu tháng</div>
-    <div class="stat-card-trend trend-up">↑ 8.5% so với tháng trước</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-icon" style="background:#fef3c7;color:#f59e0b;">🚌</div>
-    <div class="stat-card-value">35</div>
-    <div class="stat-card-label">Chuyến đang mở</div>
-    <div class="stat-card-trend trend-down">↓ 3 chuyến so với hôm qua</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-card-icon" style="background:#fdf4ff;color:#9333ea;">👥</div>
-    <div class="stat-card-value">3,890</div>
-    <div class="stat-card-label">Khách hàng</div>
-    <div class="stat-card-trend trend-up">↑ 45 mới trong tuần</div>
-  </div>
+<!-- KPI Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card kpi-blue">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@tongDon</div>
+            <div class="kpi-label">Tổng đơn hàng</div>
+        </div>
+        <div class="kpi-trend">+12%</div>
+    </div>
+    <div class="kpi-card kpi-green">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@tongDT.ToString("N0")₫</div>
+            <div class="kpi-label">Doanh thu</div>
+        </div>
+        <div class="kpi-trend">+8%</div>
+    </div>
+    <div class="kpi-card kpi-purple">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@tongKH</div>
+            <div class="kpi-label">Khách hàng</div>
+        </div>
+        <div class="kpi-trend">+5%</div>
+    </div>
+    <div class="kpi-card kpi-orange">
+        <div class="kpi-icon">🚌</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@chuyenSapDi</div>
+            <div class="kpi-label">Chuyến sắp khởi hành</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-cyan">
+        <div class="kpi-icon">🏢</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@tongNhaXe</div>
+            <div class="kpi-label">Nhà xe</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-yellow">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-info">
+            <div class="kpi-value">@donCho</div>
+            <div class="kpi-label">Đơn chờ xử lý</div>
+        </div>
+    </div>
 </div>
 
-<!-- BANG DON HANG GAN DAY -->
-<div class="admin-table-wrap">
-  <div class="admin-table-header">
-    <h3>🎫 Đơn hàng gần đây</h3>
-    <a href="/Management/QuanLyDonHang" class="admin-topbar-btn">Xem tất cả →</a>
-  </div>
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Mã đơn</th>
-        <th>Khách hàng</th>
-        <th>Tuyến đường</th>
-        <th>Ngày đi</th>
-        <th>Tổng tiền</th>
-        <th>Trạng thái</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong style="color:#3b82f6">#DV001</strong></td>
-        <td>Nguyễn Văn A</td>
-        <td>Hà Nội → TP. HCM</td>
-        <td>27/05/2026</td>
-        <td><strong>700.000₫</strong></td>
-        <td><span class="badge badge-success">Đã xác nhận</span></td>
-      </tr>
-      <tr>
-        <td><strong style="color:#3b82f6">#DV002</strong></td>
-        <td>Trần Thị B</td>
-        <td>TP. HCM → Đà Lạt</td>
-        <td>27/05/2026</td>
-        <td><strong>180.000₫</strong></td>
-        <td><span class="badge badge-warning">Chờ xử lý</span></td>
-      </tr>
-      <tr>
-        <td><strong style="color:#3b82f6">#DV003</strong></td>
-        <td>Lê Văn C</td>
-        <td>Đà Nẵng → Hội An</td>
-        <td>26/05/2026</td>
-        <td><strong>120.000₫</strong></td>
-        <td><span class="badge badge-gray">Hoàn thành</span></td>
-      </tr>
-      <tr>
-        <td><strong style="color:#3b82f6">#DV004</strong></td>
-        <td>Phạm Thị D</td>
-        <td>Hà Nội → Vinh</td>
-        <td>26/05/2026</td>
-        <td><strong>220.000₫</strong></td>
-        <td><span class="badge badge-danger">Đã hủy</span></td>
-      </tr>
-      <tr>
-        <td><strong style="color:#3b82f6">#DV005</strong></td>
-        <td>Hoàng Văn E</td>
-        <td>TP. HCM → Cần Thơ</td>
-        <td>25/05/2026</td>
-        <td><strong>150.000₫</strong></td>
-        <td><span class="badge badge-success">Đã xác nhận</span></td>
-      </tr>
-    </tbody>
-  </table>
+<!-- Charts Row -->
+<div class="charts-row">
+    <!-- Biểu đồ doanh thu -->
+    <div class="chart-panel chart-large">
+        <div class="panel-header">
+            <h3>📈 Doanh thu 6 tháng gần nhất</h3>
+        </div>
+        <div class="panel-body" style="padding:20px">
+            <canvas id="revenueChart" height="90"></canvas>
+        </div>
+    </div>
+
+    <!-- Biểu đồ tỷ lệ đơn hàng -->
+    <div class="chart-panel chart-small">
+        <div class="panel-header">
+            <h3>🥧 Trạng thái đơn</h3>
+        </div>
+        <div class="panel-body" style="padding:20px;display:flex;flex-direction:column;align-items:center">
+            <canvas id="pieChart" height="200" style="max-height:200px"></canvas>
+            <div class="pie-legend">
+                <div class="pie-item"><span class="pie-dot" style="background:#10b981"></span>Thành công: <b>@donThanhCong</b></div>
+                <div class="pie-item"><span class="pie-dot" style="background:#f59e0b"></span>Chờ xử lý: <b>@donCho</b></div>
+                <div class="pie-item"><span class="pie-dot" style="background:#ef4444"></span>Đã hủy: <b>@donDaHuy</b></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Đơn hàng gần nhất -->
+<div class="panel" style="margin-top:0">
+    <div class="panel-header">
+        <h3>📋 Đơn hàng gần nhất</h3>
+        <a asp-area="management" asp-controller="QuanLyDonHang" asp-action="Index"
+           class="btn btn-outline btn-sm">Xem tất cả →</a>
+    </div>
+    <div class="panel-body table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in don8)
+                {
+                    var (badge, label) = d.TrangThai switch {
+                        "THANHCONG" => ("badge-green",  "Thành công"),
+                        "CHOXULY"   => ("badge-yellow", "Chờ xử lý"),
+                        "DAHUY"     => ("badge-red",    "Đã hủy"),
+                        "BOCHUYEN"  => ("badge-blue",   "Bổ chuyến"),
+                        _           => ("badge-gray",   d.TrangThai ?? "—")
+                    };
+                    <tr>
+                        <td><span class="badge badge-blue">@d.MaDon</span></td>
+                        <td>
+                            <div style="font-weight:600">@(d.MaKhNavigation?.HoTen ?? d.MaKh)</div>
+                            <div style="font-size:.78rem;color:#94a3b8">@(d.MaKhNavigation?.Sdt ?? "")</div>
+                        </td>
+                        <td style="color:#64748b;font-size:.88rem">@d.NgayDat?.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td style="font-weight:700;color:#2563eb">@d.TongTien?.ToString("N0")₫</td>
+                        <td><span class="badge @badge">@label</span></td>
+                        <td>
+                            <a asp-area="management" asp-controller="QuanLyDonHang"
+                               asp-action="ChiTiet" asp-route-maDon="@d.MaDon"
+                               class="btn btn-outline btn-sm">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Biểu đồ doanh thu
+const revCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revCtx, {
+    type: 'bar',
+    data: {
+        labels: @Html.Raw(chartLabels),
+        datasets: [{
+            label: 'Doanh thu (₫)',
+            data:  @Html.Raw(chartData),
+            backgroundColor: 'rgba(37,99,235,0.15)',
+            borderColor:     '#2563eb',
+            borderWidth: 2,
+            borderRadius: 8,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                ticks: {
+                    callback: v => v >= 1000000
+                        ? (v/1000000).toFixed(1) + 'M₫'
+                        : v.toLocaleString('vi') + '₫'
+                }
+            },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+// Biểu đồ tỷ lệ
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: @Html.Raw(pieLabels),
+        datasets: [{
+            data: @Html.Raw(pieData),
+            backgroundColor: ['#10b981','#f59e0b','#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ` ${ctx.label}: ${ctx.parsed} đơn`
+                }
+            }
+        },
+        cutout: '65%'
+    }
+});
+</script>
+}
