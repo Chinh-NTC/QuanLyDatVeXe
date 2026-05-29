@@ -1,8 +1,13 @@
+@using QLDatVeXe.Models
+@using System.Text.Json
 @{
     ViewData["Title"] = "Tìm chuyến xe — BusGo";
     ViewData["Description"] = "Tìm kiếm chuyến xe theo tỉnh đi, tỉnh đến và ngày đi. So sánh giá vé, ghế còn trống.";
     ViewData["ActiveNav"] = "search";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var dsTinhThanh = ViewBag.DsTinhThanh as List<Tinhthanh>;
+    var results = ViewBag.Results as List<VChuyenxe>;
 }
 
 @section PageCss {
@@ -16,32 +21,36 @@
       <div class="form-group">
         <label class="form-label">Tỉnh đi</label>
         <select class="form-control" name="maTinhDi" id="sbc-tinh-di">
-          <option value="">-- Tất cả --</option>
-          <option value="HN">Hà Nội</option>
-          <option value="HCM">TP. Hồ Chí Minh</option>
-          <option value="DN">Đà Nẵng</option>
-          <option value="HP">Hải Phòng</option>
-          <option value="CT">Cần Thơ</option>
-          <option value="DL">Đà Lạt</option>
-          <option value="NT">Nha Trang</option>
+          <option value="">-- Chọn tỉnh đi --</option>
+          @if (dsTinhThanh != null) {
+              foreach (var t in dsTinhThanh) {
+                  if (t.MaTinh == ViewBag.MaTinhDi as string) {
+                      <option value="@t.MaTinh" selected>@t.TenTinh</option>
+                  } else {
+                      <option value="@t.MaTinh">@t.TenTinh</option>
+                  }
+              }
+          }
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Tỉnh đến</label>
         <select class="form-control" name="maTinhDen" id="sbc-tinh-den">
-          <option value="">-- Tất cả --</option>
-          <option value="HN">Hà Nội</option>
-          <option value="HCM">TP. Hồ Chí Minh</option>
-          <option value="DN">Đà Nẵng</option>
-          <option value="HP">Hải Phòng</option>
-          <option value="CT">Cần Thơ</option>
-          <option value="DL">Đà Lạt</option>
-          <option value="NT">Nha Trang</option>
+          <option value="">-- Chọn tỉnh đến --</option>
+          @if (dsTinhThanh != null) {
+              foreach (var t in dsTinhThanh) {
+                  if (t.MaTinh == ViewBag.MaTinhDen as string) {
+                      <option value="@t.MaTinh" selected>@t.TenTinh</option>
+                  } else {
+                      <option value="@t.MaTinh">@t.TenTinh</option>
+                  }
+              }
+          }
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Ngày đi</label>
-        <input type="date" class="form-control" name="ngayDi" id="sbc-ngay-di" />
+        <input type="date" class="form-control" name="ngayDi" id="sbc-ngay-di" value="@ViewBag.NgayDi" />
       </div>
       <button class="btn btn-primary" type="submit">🔍 Tìm</button>
     </form>
@@ -53,6 +62,11 @@
 
   <!-- SIDEBAR FILTER -->
   <aside class="filter-sidebar" id="filter-sidebar">
+    @if (!string.IsNullOrEmpty(ViewBag.SearchMessage as string)) {
+        <div style="background-color: #fffbeb; color: #b45309; padding: 12px; border-radius: 8px; border: 1px solid #fde68a; margin-bottom: 16px; font-size: 0.85rem;">
+            ⚠️ @ViewBag.SearchMessage
+        </div>
+    }
     <div class="filter-header">
       <h3>🔧 Bộ lọc</h3>
       <button class="btn btn-ghost btn-sm" onclick="resetFilters()">Xóa lọc</button>
@@ -72,18 +86,8 @@
     <div class="filter-section">
       <h4>Nhà xe</h4>
       <div id="carrier-filters">
-        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
-          <input type="checkbox" checked /> Phương Trang
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
-          <input type="checkbox" checked /> Thành Bưởi
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;cursor:pointer">
-          <input type="checkbox" checked /> Hoàng Long
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;cursor:pointer">
-          <input type="checkbox" checked /> Kumho Samco
-        </label>
+        <!-- TODO: Load carrier list from NHAXE table via Controller -->
+        <p style="font-size:.83rem; color:#94a3b8; font-style:italic;">Danh sách nhà xe sẽ được tải từ cơ sở dữ liệu.</p>
       </div>
     </div>
 
@@ -102,7 +106,7 @@
   <main class="search-results">
     <div class="results-header" id="results-header">
       <div id="results-summary">
-        Tìm thấy <strong>5</strong> chuyến xe
+        Đang tìm kiếm chuyến xe...
       </div>
       <div class="sort-bar">
         <span class="text-sm text-muted">Sắp xếp:</span>
@@ -116,13 +120,32 @@
     </div>
 
     <script>
-      window.TRIPS_DATA = [
-        { maChuyen:"CX001", gioDi:"07:00", gioDiShort:"07:00", gioDenShort:"21:00", benDi:"Bến Mỹ Đình", benDen:"Bến Miền Đông", ngayDi:"27/05/2026", giaVe:350000, loaiXe:"Giường nằm", imgXe:"x1.jpg", tenNhaXe:"Phương Trang", khoangCach:1700, thoiGian:840, soGheTrong:12, bookUrl:"/Booking?maChuyen=CX001" },
-        { maChuyen:"CX002", gioDi:"08:30", gioDiShort:"08:30", gioDenShort:"13:00", benDi:"Bến Miền Đông", benDen:"Bến Đà Lạt", ngayDi:"27/05/2026", giaVe:180000, loaiXe:"Limousine VIP", imgXe:"x2.jpg", tenNhaXe:"Thành Bưởi", khoangCach:300, thoiGian:270, soGheTrong:5, bookUrl:"/Booking?maChuyen=CX002" },
-        { maChuyen:"CX003", gioDi:"06:00", gioDiShort:"06:00", gioDenShort:"09:00", benDi:"Bến Đà Nẵng", benDen:"Bến Hội An", ngayDi:"27/05/2026", giaVe:120000, loaiXe:"Xe 2 tầng", imgXe:"x3.jpg", tenNhaXe:"Hoàng Long", khoangCach:30, thoiGian:180, soGheTrong:20, bookUrl:"/Booking?maChuyen=CX003" },
-        { maChuyen:"CX004", gioDi:"14:00", gioDiShort:"14:00", gioDenShort:"22:00", benDi:"Bến Giáp Bát", benDen:"Bến Vinh", ngayDi:"27/05/2026", giaVe:220000, loaiXe:"Ghế ngồi", imgXe:"x4.jpg", tenNhaXe:"Kumho Samco", khoangCach:290, thoiGian:480, soGheTrong:8, bookUrl:"/Booking?maChuyen=CX004" },
-        { maChuyen:"CX005", gioDi:"22:00", gioDiShort:"22:00", gioDenShort:"06:00", benDi:"Bến TP.HCM", benDen:"Bến Cần Thơ", ngayDi:"27/05/2026", giaVe:150000, loaiXe:"Giường nằm", imgXe:"x5.jpg", tenNhaXe:"Phương Trang", khoangCach:170, thoiGian:480, soGheTrong:15, bookUrl:"/Booking?maChuyen=CX005" }
-      ];
+      @{
+          var jsonTrips = "[]";
+          if (results != null)
+          {
+              var tripsObj = results.Select(c => new {
+                  maChuyen = c.MaChuyen,
+                  tenNhaXe = c.TenNhaXe,
+                  giaVe = c.GiaVe,
+                  gioDi = c.GioDi.ToString(@"HH\:mm"),
+                  soGheTrong = c.TongGheTot - (c.SoGheDaDat ?? 0),
+                  loaiXe = c.LoaiXe,
+                  imgXe = c.ImgXe,
+                  gioDiShort = c.GioDi.ToString(@"HH\:mm"),
+                  gioDenShort = c.GioDi.Add(TimeSpan.FromMinutes((double)c.ThoiGianDuKien)).ToString(@"HH\:mm"),
+                  thoiGian = c.ThoiGianDuKien,
+                  tinhDi = c.TinhDi,
+                  benDi = c.BenDi,
+                  tinhDen = c.TinhDen,
+                  benDen = c.BenDen,
+                  ngayDi = c.NgayDi.ToString("yyyy-MM-dd"),
+                  bookUrl = $"/DatVe/ChonGhe?maChuyen={c.MaChuyen}"
+              });
+              jsonTrips = JsonSerializer.Serialize(tripsObj);
+          }
+      }
+      window.TRIPS_DATA = @Html.Raw(jsonTrips);
       window.CTX = '';
     </script>
 
@@ -141,19 +164,4 @@
 
 @section Scripts {
   <script src="~/assets/js/search.js" asp-append-version="true"></script>
-  <script>
-    function resetFilters() {
-      document.querySelectorAll('#time-chips .chip').forEach(c => c.classList.remove('active'));
-      document.querySelector('#time-chips .chip[data-time="all"]').classList.add('active');
-      document.getElementById('price-min').value = '';
-      document.getElementById('price-max').value = '';
-      applyFilters();
-    }
-    function selectTime(el, val) {
-      document.querySelectorAll('#time-chips .chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      applyFilters();
-    }
-    function applyFilters() { if(typeof renderTrips === 'function') renderTrips(); }
-  </script>
 }
