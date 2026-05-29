@@ -1,0 +1,276 @@
+@model List<QLDatVeXe.Models.VChuyenxe>
+@{
+    ViewBag.Title    = "Đặt vé hộ khách";
+    ViewBag.PageName = "TimChuyen";
+    var dsTinh       = ViewBag.DsTinh    as List<QLDatVeXe.Models.Tinhthanh> ?? new();
+    var dsKhachHang  = ViewBag.DsKhachHang as List<QLDatVeXe.Models.Khachhang> ?? new();
+    var maTinhDi     = ViewBag.MaTinhDi  as string ?? "";
+    var maTinhDen    = ViewBag.MaTinhDen as string ?? "";
+    var ngayDi       = ViewBag.NgayDi    as string ?? "";
+    var maKhachHang  = ViewBag.MaKhachHang as string ?? "";
+}
+
+<!-- Form tìm chuyến -->
+<div class="panel" style="margin-bottom:20px">
+    <div class="panel-header"><h3>🔍 Tìm chuyến xe</h3></div>
+    <div class="panel-body" style="padding:20px">
+        <form asp-action="TimChuyen" method="get">
+            <div style="display:grid;grid-template-columns:1fr auto 1fr 1fr auto;gap:12px;align-items:flex-end">
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Tỉnh đi</label>
+                    <select class="form-control" name="maTinhDi" id="tc-tinh-di">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var t in dsTinh)
+                        {
+                            <option value="@t.MaTinh" selected="@(t.MaTinh == maTinhDi ? "selected" : null)">@t.TenTinh</option>
+                        }
+                    </select>
+                </div>
+                <div style="display:flex;align-items:center;padding-bottom:4px;font-size:1.5rem;color:#2563eb;cursor:pointer"
+                     onclick="swapTinh()">⇄</div>
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Tỉnh đến</label>
+                    <select class="form-control" name="maTinhDen" id="tc-tinh-den">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var t in dsTinh)
+                        {
+                            <option value="@t.MaTinh" selected="@(t.MaTinh == maTinhDen ? "selected" : null)">@t.TenTinh</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Ngày đi</label>
+                    <input type="date" class="form-control" name="ngayDi" value="@ngayDi" />
+                </div>
+                <button type="submit" class="btn btn-primary">🔍 Tìm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Kết quả tìm kiếm -->
+@if (Model is not null)
+{
+<div class="panel">
+    <div class="panel-header">
+        <h3>🚌 Kết quả (@Model.Count chuyến)</h3>
+    </div>
+    <div class="panel-body table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Mã chuyến</th>
+                    <th>Tuyến đường</th>
+                    <th>Ngày / Giờ đi</th>
+                    <th>Nhà xe</th>
+                    <th>Loại xe</th>
+                    <th>Giá vé</th>
+                    <th>Ghế trống</th>
+                    <th>Đặt vé hộ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    var soGheTrong = c.SoGheTrong ?? 0;
+                    <tr>
+                        <td><span class="badge badge-blue">@c.MaChuyen</span></td>
+                        <td>
+                            <div style="font-weight:600">@c.TinhDi</div>
+                            <div style="font-size:.75rem;color:#64748b">→ @c.TinhDen</div>
+                            <div style="font-size:.72rem;color:#94a3b8">@c.BenDi → @c.BenDen</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:600">@c.NgayDi.ToString("dd/MM/yyyy")</div>
+                            <div style="color:#2563eb;font-weight:700">@c.GioDi.ToString("HH:mm")</div>
+                        </td>
+                        <td>@c.TenNhaXe</td>
+                        <td style="font-size:.82rem;color:#475569">@(c.LoaiXe ?? "—")</td>
+                        <td style="font-weight:700;color:#059669">@c.GiaVe.ToString("N0")₫</td>
+                        <td>
+                            <span class="badge @(soGheTrong > 0 ? "badge-green" : "badge-red")">
+                                @soGheTrong ghế
+                            </span>
+                        </td>
+                        <td>
+                            @if (soGheTrong > 0)
+                            {
+                                <button class="btn btn-primary btn-sm"
+                                        onclick="moModalDatVe('@c.MaChuyen','@c.TinhDi','@c.TinhDen','@c.NgayDi.ToString("dd/MM/yyyy")','@c.GioDi.ToString("HH:mm")','@c.GiaVe.ToString("N0")','@c.TenNhaXe')">
+                                    🎫 Đặt vé
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="badge badge-gray">Hết ghế</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8">
+                        <div style="font-size:2rem;margin-bottom:8px">🔍</div>
+                        Không tìm thấy chuyến xe phù hợp.
+                    </td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+
+<!-- MODAL ĐẶT VÉ HỘ -->
+<div id="modal-dat-ve" class="staff-modal-overlay" style="display:none">
+    <div class="staff-modal">
+        <div class="staff-modal-header">
+            <h3>🎫 Đặt vé hộ khách</h3>
+            <button onclick="dongModal()" class="modal-close">✕</button>
+        </div>
+        <div class="staff-modal-body">
+            <!-- Thông tin chuyến -->
+            <div class="modal-trip-info">
+                <div class="modal-trip-route" id="modal-route">—</div>
+                <div class="modal-trip-meta" id="modal-meta">—</div>
+            </div>
+
+            <form id="form-dat-ve-ho" asp-area="management" asp-controller="NhanVien" asp-action="DatVeHo" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="maChuyen" id="inp-maChuyen" />
+                <input type="hidden" name="giaVeLucDat" id="inp-giaVe" />
+
+                <!-- Chọn khách hàng -->
+                <div class="modal-section">
+                    <label class="form-label">👤 Khách hàng <span style="color:red">*</span></label>
+                    <div style="display:flex;gap:8px;margin-bottom:8px">
+                        <input type="text" id="kh-search" placeholder="Tìm theo tên / SĐT…"
+                               class="form-control" style="flex:1"
+                               oninput="filterKhachHang(this.value)" />
+                    </div>
+                    <div id="kh-list" class="kh-list-scroll">
+                        @foreach (var kh in dsKhachHang)
+                        {
+                            <label class="kh-radio-item">
+                                <input type="radio" name="maKhachHang" value="@kh.MaKh"
+                                       data-name="@kh.HoTen" data-sdt="@kh.Sdt"
+                                       onchange="onChonKH('@kh.HoTen','@kh.Sdt')" />
+                                <div class="kh-radio-avatar">@(kh.HoTen.Length>0?kh.HoTen[0].ToString().ToUpper():"?")</div>
+                                <div>
+                                    <div style="font-weight:600">@kh.HoTen</div>
+                                    <div style="font-size:.78rem;color:#64748b">@kh.Sdt — @kh.TenDangNhap</div>
+                                </div>
+                            </label>
+                        }
+                    </div>
+                    <div id="kh-selected-info" style="display:none;margin-top:8px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;font-size:.88rem;color:#166534">
+                        ✅ Đã chọn: <b id="kh-selected-name"></b> — <span id="kh-selected-sdt"></span>
+                    </div>
+                </div>
+
+                <!-- Chọn ghế -->
+                <div class="modal-section">
+                    <label class="form-label">💺 Chọn ghế (Tối đa 5) <span style="color:red">*</span></label>
+                    <div id="ghe-container" style="color:#94a3b8;font-size:.85rem">Đang tải ghế…</div>
+                </div>
+
+                <!-- Thông tin người đi -->
+                <div class="modal-section">
+                    <label class="form-label">📝 Thông tin người đi</label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                        <div>
+                            <label class="form-label" style="font-size:.8rem">Họ tên người đi</label>
+                            <input type="text" name="tenNguoiDi" id="inp-tenNguoiDi" class="form-control"
+                                   placeholder="Để trống nếu chính khách hàng" />
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size:.8rem">SĐT người đi</label>
+                            <input type="text" name="sdtNguoiDi" id="inp-sdtNguoiDi" class="form-control"
+                                   placeholder="Để trống nếu chính khách hàng" />
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+                    <button type="button" onclick="dongModal()" class="btn btn-ghost">Hủy</button>
+                    <button type="submit" class="btn btn-primary">✅ Xác nhận đặt vé</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function swapTinh() {
+    const di  = document.getElementById('tc-tinh-di');
+    const den = document.getElementById('tc-tinh-den');
+    const tmp = di.value; di.value = den.value; den.value = tmp;
+}
+
+function moModalDatVe(maChuyen, tinhDi, tinhDen, ngay, gio, gia, nhaXe) {
+    document.getElementById('modal-dat-ve').style.display = 'flex';
+    document.getElementById('inp-maChuyen').value = maChuyen;
+    document.getElementById('inp-giaVe').value    = gia.replace(/[^0-9]/g,'');
+    document.getElementById('modal-route').textContent = tinhDi + ' → ' + tinhDen;
+    document.getElementById('modal-meta').textContent  = ngay + ' lúc ' + gio + ' | ' + nhaXe + ' | ' + gia + '₫';
+    document.getElementById('ghe-container').textContent = 'Đang tải ghế…';
+    // Load danh sách ghế
+    fetch('/management/NhanVien/LayDanhSachGhe?maChuyen=' + maChuyen)
+        .then(r => r.json())
+        .then(ghes => hienThiGhe(ghes))
+        .catch(() => { document.getElementById('ghe-container').textContent = 'Không thể tải danh sách ghế.'; });
+}
+
+function hienThiGhe(ghes) {
+    const container = document.getElementById('ghe-container');
+    if (!ghes.length) { container.innerHTML = '<span style="color:#ef4444">Không còn ghế trống</span>'; return; }
+    const tang1 = ghes.filter(g => g.tang === 1);
+    const tang2 = ghes.filter(g => g.tang === 2);
+    let html = '';
+    const renderTang = (ds, label) => {
+        if (!ds.length) return '';
+        let t = `<div class="ghe-tang-label">${label}</div><div class="ghe-grid">`;
+        ds.forEach(g => {
+            t += `<label class="ghe-item ${g.trangThai !== 'TRONG' ? 'ghe-dadat' : ''}"><input type="checkbox" name="maGhes" value="${g.maGhe}" ${g.trangThai !== 'TRONG' ? 'disabled' : ''} onchange="checkMaxGhe(this)" />${g.soGhe}</label>`;
+        });
+        return t + '</div>';
+    };
+    html += renderTang(tang1, '🔵 Tầng 1');
+    html += renderTang(tang2, '🟢 Tầng 2');
+    container.innerHTML = html;
+}
+
+function checkMaxGhe(cb) {
+    const checkedBoxes = document.querySelectorAll('input[name="maGhes"]:checked');
+    if (checkedBoxes.length > 5) {
+        cb.checked = false;
+        alert("Chỉ được chọn tối đa 5 ghế.");
+    }
+}
+
+function dongModal() {
+    document.getElementById('modal-dat-ve').style.display = 'none';
+}
+
+function filterKhachHang(search) {
+    const s = search.toLowerCase();
+    document.querySelectorAll('.kh-radio-item').forEach(el => {
+        const name = (el.querySelector('[data-name]')?.dataset.name ?? '').toLowerCase();
+        const sdt  = (el.querySelector('[data-sdt]')?.dataset.sdt   ?? '').toLowerCase();
+        el.style.display = name.includes(s) || sdt.includes(s) ? '' : 'none';
+    });
+}
+
+function onChonKH(name, sdt) {
+    document.getElementById('kh-selected-info').style.display = 'block';
+    document.getElementById('kh-selected-name').textContent = name;
+    document.getElementById('kh-selected-sdt').textContent = sdt;
+    document.getElementById('inp-tenNguoiDi').placeholder = name;
+    document.getElementById('inp-sdtNguoiDi').placeholder = sdt;
+}
+
+document.getElementById('modal-dat-ve')?.addEventListener('click', function(e) {
+    if (e.target === this) dongModal();
+});
+</script>
+}

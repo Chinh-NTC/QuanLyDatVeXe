@@ -1,0 +1,54 @@
+@model List<QLDatVeXe.Models.Nhaxe>
+@{
+    ViewBag.Title    = "Danh sách Nhà xe";
+    ViewBag.PageName = "XemNhaXe";
+    var search = ViewBag.Search as string ?? "";
+}
+
+<div class="toolbar">
+    <form method="get" class="toolbar-search">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" name="search" value="@search" placeholder="Tên nhà xe, SĐT…" class="search-input" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Tìm</button>
+        @if (!string.IsNullOrEmpty(search))
+        { <a href="" class="btn btn-ghost btn-sm">✕ Xóa</a> }
+    </form>
+    <span class="stat-badge">Tổng: <b>@Model.Count</b> nhà xe</span>
+</div>
+
+<div class="nhaxe-grid">
+    @foreach (var nx in Model)
+    {
+        var colors = new[]{"#2563eb","#7c3aed","#059669","#d97706","#dc2626","#0891b2"};
+        var color  = colors[Math.Abs(nx.MaNhaXe.GetHashCode()) % colors.Length];
+        <div class="nhaxe-card">
+            <div class="nhaxe-banner" style="background:@color">
+                <div class="nhaxe-logo-circle">
+                    @(nx.TenNhaXe.Length>0?nx.TenNhaXe[0].ToString().ToUpper():"?")
+                </div>
+            </div>
+            <div class="nhaxe-body">
+                <h3 class="nhaxe-name">@nx.TenNhaXe</h3>
+                <div class="nhaxe-meta">
+                    @if (!string.IsNullOrEmpty(nx.Sdt))   { <span>📞 @nx.Sdt</span> }
+                    @if (!string.IsNullOrEmpty(nx.Email))  { <span>✉️ @nx.Email</span> }
+                    @if (!string.IsNullOrEmpty(nx.DiaChi)) { <span>📍 @nx.DiaChi</span> }
+                </div>
+                <div class="nhaxe-stats">
+                    <div class="nhaxe-stat">
+                        <div class="nhaxe-stat-val">@nx.Xe.Count</div>
+                        <div class="nhaxe-stat-lbl">Xe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:#94a3b8">
+            <div style="font-size:3rem">🏢</div>Không tìm thấy nhà xe.
+        </div>
+    }
+</div>
