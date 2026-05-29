@@ -1,0 +1,64 @@
+@model List<QLDatVeXe.Models.Khachhang>
+@{
+    ViewBag.Title    = "Danh sách Khách hàng";
+    ViewBag.PageName = "XemKH";
+    var search = ViewBag.Search as string ?? "";
+}
+
+<div class="toolbar">
+    <form method="get" class="toolbar-search">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" name="search" value="@search" placeholder="Tên, SĐT, tên đăng nhập…" class="search-input" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Tìm</button>
+        @if (!string.IsNullOrEmpty(search))
+        { <a href="" class="btn btn-ghost btn-sm">✕ Xóa</a> }
+    </form>
+    <span class="stat-badge">Tổng: <b>@Model.Count</b> khách</span>
+</div>
+
+<div class="panel">
+    <div class="panel-body table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>#</th><th>Khách hàng</th><th>Tên đăng nhập</th><th>Số điện thoại</th><th>Giới tính</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+                @{ int stt = 1; }
+                @foreach (var kh in Model)
+                {
+                    <tr>
+                        <td style="color:#94a3b8;font-size:.82rem">@(stt++)</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+                                    @(kh.HoTen.Length>0?kh.HoTen[0].ToString().ToUpper():"?")
+                                </div>
+                                <div>
+                                    <div style="font-weight:600">@kh.HoTen</div>
+                                    <div style="font-size:.75rem;color:#94a3b8">@kh.MaKh</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-size:.88rem">@kh.TenDangNhap</td>
+                        <td>@kh.Sdt</td>
+                        <td>
+                            @if (kh.GioiTinh == true)  { <span class="badge" style="background:#dbeafe;color:#1d4ed8">♂ Nam</span> }
+                            else if (kh.GioiTinh == false) { <span class="badge" style="background:#fce7f3;color:#be185d">♀ Nữ</span> }
+                            else { <span style="color:#94a3b8">—</span> }
+                        </td>
+                        <td>
+                            @if (kh.Trangthai) { <span class="badge badge-green">● Hoạt động</span> }
+                            else               { <span class="badge badge-red">⊗ Đã khóa</span> }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" style="text-align:center;padding:40px;color:#94a3b8">
+                        <div style="font-size:2rem">👥</div>Không tìm thấy khách hàng.
+                    </td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
