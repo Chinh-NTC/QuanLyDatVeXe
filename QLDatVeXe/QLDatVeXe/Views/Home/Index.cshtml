@@ -1,8 +1,12 @@
+@using QLDatVeXe.Models
 @{
     ViewData["Title"] = "BusGo — Đặt Vé Xe Online Nhanh Chóng & Tiện Lợi";
     ViewData["Description"] = "Đặt vé xe online dễ dàng, nhanh chóng. Tìm kiếm hàng trăm tuyến xe, chọn ghế linh hoạt, thanh toán an toàn.";
     ViewData["ActiveNav"] = "home";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var dsTinhThanh = ViewBag.DsTinhThanh as List<Tinhthanh>;
+    var upcoming = ViewBag.Upcoming as List<VChuyenxe>;
 }
 
 @section PageCss {
@@ -111,24 +115,24 @@
           <div class="form-group">
             <label class="form-label">📍 Tỉnh đi</label>
             <select class="form-control" name="maTinhDi" id="select-tinh-di">
-              <option value="">-- Tất cả các tỉnh --</option>
-              <option value="HN">Hà Nội</option>
-              <option value="HCM">TP. Hồ Chí Minh</option>
-              <option value="DN">Đà Nẵng</option>
-              <option value="HP">Hải Phòng</option>
-              <option value="CT">Cần Thơ</option>
+              <option value="">-- Chọn tỉnh đi --</option>
+              @if (dsTinhThanh != null) {
+                  foreach (var t in dsTinhThanh) {
+                      <option value="@t.MaTinh">@t.TenTinh</option>
+                  }
+              }
             </select>
           </div>
           <button type="button" class="swap-btn" id="swap-btn" title="Đổi chiều" onclick="swapStations()">⇄</button>
           <div class="form-group">
             <label class="form-label">📍 Tỉnh đến</label>
             <select class="form-control" name="maTinhDen" id="select-tinh-den">
-              <option value="">-- Tất cả các tỉnh --</option>
-              <option value="HN">Hà Nội</option>
-              <option value="HCM">TP. Hồ Chí Minh</option>
-              <option value="DN">Đà Nẵng</option>
-              <option value="HP">Hải Phòng</option>
-              <option value="CT">Cần Thơ</option>
+              <option value="">-- Chọn tỉnh đến --</option>
+              @if (dsTinhThanh != null) {
+                  foreach (var t in dsTinhThanh) {
+                      <option value="@t.MaTinh">@t.TenTinh</option>
+                  }
+              }
             </select>
           </div>
           <div class="form-group">
@@ -155,28 +159,28 @@
       <p>Click để xem toàn bộ chuyến đi đến các địa danh hấp dẫn</p>
     </div>
     <div class="dest-grid">
-      <div class="dest-card" onclick="quickSearch('HCM')">
+      <div class="dest-card" onclick="quickSearch('T26')">
         <img src="~/assets/img/1.jpg" alt="TP. Hồ Chí Minh" />
         <div class="dest-overlay">
           <h4>TP. Hồ Chí Minh</h4>
           <p>Xem tất cả chuyến đến đây →</p>
         </div>
       </div>
-      <div class="dest-card" onclick="quickSearch('HN')">
+      <div class="dest-card" onclick="quickSearch('T07')">
         <img src="~/assets/img/2.jpg" alt="Hà Nội" />
         <div class="dest-overlay">
           <h4>Hà Nội</h4>
           <p>Xem tất cả chuyến đến đây →</p>
         </div>
       </div>
-      <div class="dest-card" onclick="quickSearch('DN')">
+      <div class="dest-card" onclick="quickSearch('T18')">
         <img src="~/assets/img/3.jpg" alt="Đà Nẵng" />
         <div class="dest-overlay">
           <h4>Đà Nẵng</h4>
           <p>Xem tất cả chuyến đến đây →</p>
         </div>
       </div>
-      <div class="dest-card" onclick="quickSearch('HP')">
+      <div class="dest-card" onclick="quickSearch('T20')">
         <img src="~/assets/img/4.jpg" alt="Hải Phòng" />
         <div class="dest-overlay">
           <h4>Hải Phòng</h4>
@@ -194,141 +198,56 @@
       <h2>🚌 Chuyến xe sắp khởi hành</h2>
       <p>Khám phá các hành trình chất lượng cao sắp khởi hành</p>
     </div>
-    <div class="trips-list" id="featured-trips-list">
-      <!-- Card mẫu 1 -->
-      <a href="/Booking?maChuyen=CX001" class="premium-trip-card">
-        <div class="ptc-image-wrap">
-          <img src="~/assets/img/x1.jpg" alt="Xe giường nằm" onerror="this.src='~/assets/img/bus-default.jpg'" />
-          <div class="ptc-badge">Giường nằm</div>
-        </div>
-        <div class="ptc-content">
-          <div class="ptc-top">
-            <div class="ptc-carrier">
-              <span>🏢 Nhà xe</span>
-              <strong>Phương Trang</strong>
-            </div>
-            <div class="ptc-info-pills">
-              <span class="ptc-pill success">Còn 12 ghế</span>
-              <span class="ptc-pill">27/05/2026</span>
-            </div>
+    <div id="featured-trips-list" class="trips-list">
+      @if (upcoming != null && upcoming.Count > 0)
+      {
+          foreach (var c in upcoming)
+          {
+              <a href="/DatVe/ChonGhe?maChuyen=@c.MaChuyen" class="premium-trip-card">
+                  <div class="ptc-image-wrap">
+                      <div class="ptc-badge">Sắp khởi hành</div>
+                      <img src="~/assets/img/@(string.IsNullOrEmpty(c.ImgXe) ? "bus-default.jpg" : c.ImgXe)" alt="@c.TenNhaXe">
+                  </div>
+                  <div class="ptc-content">
+                      <div class="ptc-top">
+                          <div class="ptc-carrier">🚌 <strong>@c.TenNhaXe</strong> • @c.LoaiXe</div>
+                      </div>
+                      <div class="ptc-main">
+                          <div class="ptc-time-box">
+                              <span class="ptc-time">@c.GioDi.ToString(@"HH\:mm")</span>
+                              <span class="ptc-station">@c.TinhDi (@c.BenDi)</span>
+                          </div>
+                          <div class="ptc-route-visual">
+                              <span class="ptc-duration">@(Math.Round((double)c.ThoiGianDuKien / 60.0, 1)) giờ</span>
+                              <div class="ptc-line-wrap">
+                                  <div class="ptc-bus-icon">🚐</div>
+                              </div>
+                          </div>
+                          <div class="ptc-time-box">
+                              <span class="ptc-time">@c.GioDi.Add(TimeSpan.FromMinutes((double)c.ThoiGianDuKien)).ToString(@"HH\:mm")</span>
+                              <span class="ptc-station">@c.TinhDen (@c.BenDen)</span>
+                          </div>
+                      </div>
+                      <div class="ptc-bottom">
+                          <div class="ptc-info-pills">
+                              <span class="ptc-pill">Ngày đi: @c.NgayDi.ToString("dd/MM/yyyy")</span>
+                              <span class="ptc-pill success">Còn @(c.TongGheTot - (c.SoGheDaDat ?? 0)) ghế</span>
+                          </div>
+                          <div class="ptc-price-wrap">
+                              <span class="ptc-price">@c.GiaVe.ToString("N0")₫</span>
+                          </div>
+                      </div>
+                  </div>
+              </a>
+          }
+      }
+      else
+      {
+          <div style="text-align:center; padding: 60px 20px; color: #94a3b8;">
+            <div style="font-size:3rem; margin-bottom:16px;">🚌</div>
+            <div style="font-size:1.1rem; font-weight:600; margin-bottom:8px;">Chưa có chuyến xe nào sắp chạy</div>
           </div>
-          <div class="ptc-main">
-            <div class="ptc-time-box">
-              <span class="ptc-time">07:00</span>
-              <span class="ptc-station">Hà Nội</span>
-            </div>
-            <div class="ptc-route-visual">
-              <span class="ptc-duration">⏱ 14h</span>
-              <div class="ptc-line-wrap">
-                <div class="ptc-bus-icon">🚌</div>
-              </div>
-            </div>
-            <div class="ptc-time-box" style="text-align:right">
-              <span class="ptc-time">21:00</span>
-              <span class="ptc-station">TP. HCM</span>
-            </div>
-          </div>
-          <div class="ptc-bottom">
-            <div style="font-size: 0.85rem; color: var(--gray-500)">
-              📍 Bến Mỹ Đình → Bến Miền Đông
-            </div>
-            <div class="ptc-price-wrap">
-              <span class="ptc-price-label">Chỉ từ</span>
-              <span class="ptc-price">350.000₫</span>
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <!-- Card mẫu 2 -->
-      <a href="/Booking?maChuyen=CX002" class="premium-trip-card">
-        <div class="ptc-image-wrap">
-          <img src="~/assets/img/x2.jpg" alt="Limousine" onerror="this.src='~/assets/img/bus-default.jpg'" />
-          <div class="ptc-badge">Limousine VIP</div>
-        </div>
-        <div class="ptc-content">
-          <div class="ptc-top">
-            <div class="ptc-carrier">
-              <span>🏢 Nhà xe</span>
-              <strong>Thành Bưởi</strong>
-            </div>
-            <div class="ptc-info-pills">
-              <span class="ptc-pill success">Còn 5 ghế</span>
-              <span class="ptc-pill">27/05/2026</span>
-            </div>
-          </div>
-          <div class="ptc-main">
-            <div class="ptc-time-box">
-              <span class="ptc-time">08:30</span>
-              <span class="ptc-station">TP. HCM</span>
-            </div>
-            <div class="ptc-route-visual">
-              <span class="ptc-duration">⏱ 4h 30m</span>
-              <div class="ptc-line-wrap">
-                <div class="ptc-bus-icon">🚌</div>
-              </div>
-            </div>
-            <div class="ptc-time-box" style="text-align:right">
-              <span class="ptc-time">13:00</span>
-              <span class="ptc-station">Đà Lạt</span>
-            </div>
-          </div>
-          <div class="ptc-bottom">
-            <div style="font-size: 0.85rem; color: var(--gray-500)">
-              📍 Bến Miền Đông → Bến Đà Lạt
-            </div>
-            <div class="ptc-price-wrap">
-              <span class="ptc-price-label">Chỉ từ</span>
-              <span class="ptc-price">180.000₫</span>
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <!-- Card mẫu 3 -->
-      <a href="/Booking?maChuyen=CX003" class="premium-trip-card">
-        <div class="ptc-image-wrap">
-          <img src="~/assets/img/x3.jpg" alt="Xe 2 tầng" onerror="this.src='~/assets/img/bus-default.jpg'" />
-          <div class="ptc-badge">Xe 2 tầng</div>
-        </div>
-        <div class="ptc-content">
-          <div class="ptc-top">
-            <div class="ptc-carrier">
-              <span>🏢 Nhà xe</span>
-              <strong>Hoàng Long</strong>
-            </div>
-            <div class="ptc-info-pills">
-              <span class="ptc-pill success">Còn 20 ghế</span>
-              <span class="ptc-pill">27/05/2026</span>
-            </div>
-          </div>
-          <div class="ptc-main">
-            <div class="ptc-time-box">
-              <span class="ptc-time">06:00</span>
-              <span class="ptc-station">Đà Nẵng</span>
-            </div>
-            <div class="ptc-route-visual">
-              <span class="ptc-duration">⏱ 3h</span>
-              <div class="ptc-line-wrap">
-                <div class="ptc-bus-icon">🚌</div>
-              </div>
-            </div>
-            <div class="ptc-time-box" style="text-align:right">
-              <span class="ptc-time">09:00</span>
-              <span class="ptc-station">Hội An</span>
-            </div>
-          </div>
-          <div class="ptc-bottom">
-            <div style="font-size: 0.85rem; color: var(--gray-500)">
-              📍 Bến Đà Nẵng → Bến Hội An
-            </div>
-            <div class="ptc-price-wrap">
-              <span class="ptc-price-label">Chỉ từ</span>
-              <span class="ptc-price">120.000₫</span>
-            </div>
-          </div>
-        </div>
-      </a>
+      }
     </div>
     <div style="text-align:center;margin-top:48px">
       <a href="/Search" class="btn btn-outline btn-lg" style="padding: 12px 40px; border-radius: 99px">Xem tất cả chuyến xe →</a>
