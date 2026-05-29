@@ -1,26 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
-using QLDatVeXe.Models;
-using System.Diagnostics;
+using QLDatVeXe.Helpers;
+using QLDatVeXe.Repositories.Interfaces;
 
-namespace QLDatVeXe.Controllers
+namespace QLDatVeXe.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IChuyenXeRepository _chuyenXeRepo;
+
+    public HomeController(IChuyenXeRepository chuyenXeRepo)
     {
-        // GET: /
-        public IActionResult Index()
-        {
-            return View();
-        }
+        _chuyenXeRepo = chuyenXeRepo;
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    public async Task<IActionResult> Index()
+    {
+        var user         = SessionHelper.GetCurrentUser(HttpContext.Session);
+        ViewBag.User     = user;
+        ViewBag.DsTinhThanh = await _chuyenXeRepo.GetAllTinhThanhAsync();
+        ViewBag.Upcoming = await _chuyenXeRepo.GetUpcomingAsync(6);
+        ViewBag.TopMaTinh= await _chuyenXeRepo.GetTopDestinationsAsync(4);
+        return View();
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    public IActionResult Error()
+    {
+        return View();
     }
 }
