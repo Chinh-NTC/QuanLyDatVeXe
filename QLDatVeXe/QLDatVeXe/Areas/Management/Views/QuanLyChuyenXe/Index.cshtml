@@ -1,102 +1,213 @@
+@model List<QLDatVeXe.Models.Chuyenxe>
+@using QLDatVeXe.Domain.Enums
+@using QLDatVeXe.Helpers
 @{
-    ViewData["Title"] = "Quản lý Chuyến xe";
-    ViewData["AdminNav"] = "chuyenxe";
-    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+    ViewBag.Title = "Quản lý chuyến xe";
+    ViewBag.PageName = "ChuyenXe";
+    var dsTuyen = ViewBag.DsTuyen as List<QLDatVeXe.Models.Tuyenduong> ?? new();
+    var dsXe    = ViewBag.DsXe   as List<QLDatVeXe.Models.Xe>         ?? new();
+    var isQL    = SessionHelper.GetVaiTro(Context.Session) == VaiTro.QuanLy;
 }
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-  <div>
-    <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b;">🚌 Danh sách Chuyến xe</h2>
-    <p style="color:#64748b;font-size:0.88rem;margin-top:4px;">Quản lý tất cả chuyến xe trong hệ thống</p>
-  </div>
-  <button class="admin-topbar-btn" style="background:#3b82f6;color:white;border-color:#3b82f6;">+ Thêm chuyến mới</button>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h2 style="font-size:1.2rem;font-weight:700">Danh sách chuyến xe (@Model.Count)</h2>
+    @if (isQL)
+    {
+        <button class="btn btn-primary" onclick="openModal('modal-them-chuyen')">+ Thêm chuyến</button>
+    }
 </div>
 
-<!-- FILTER BAR -->
-<div style="background:white;border-radius:12px;padding:16px 20px;border:1px solid #f1f5f9;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-  <select class="form-control" style="width:auto;min-width:140px;">
-    <option>Tất cả trạng thái</option>
-    <option>Đang mở bán</option>
-    <option>Đã khởi hành</option>
-    <option>Hoàn thành</option>
-    <option>Đã hủy</option>
-  </select>
-  <input type="date" class="form-control" style="width:auto;" />
-  <input type="text" class="form-control" style="flex:1;min-width:200px;" placeholder="🔍 Tìm theo tuyến, mã chuyến..." />
-  <button class="admin-topbar-btn">Lọc</button>
+<div class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã chuyến</th>
+                    <th>Tuyến đường</th>
+                    <th>Ngày đi</th>
+                    <th>Giờ đi</th>
+                    <th>Xe</th>
+                    <th>Giá vé</th>
+                    <th>Trạng thái</th>
+                    @if (isQL) { <th>Thao tác</th> }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    var badge = c.TrangThai switch {
+                        "SAPDI"      => "badge-blue",
+                        "DANGCHAY"   => "badge-green",
+                        "DADUNGBAI"  => "badge-gray",
+                        "HUY"        => "badge-red",
+                        _            => "badge-gray"
+                    };
+                    <tr>
+                        <td><span class="badge badge-blue">@c.MaChuyen</span></td>
+                        <td>
+                            @(c.MaTuyenNavigation?.MaBenDiNavigation?.TenBenXe ?? c.MaTuyen)
+                            <span style="color:var(--gray-400)"> → </span>
+                            @(c.MaTuyenNavigation?.MaBenDenNavigation?.TenBenXe ?? "")
+                        </td>
+                        <td>@c.NgayDi.ToString("dd/MM/yyyy")</td>
+                        <td>@c.GioDi.ToString("HH:mm")</td>
+                        <td>@(c.BienSoNavigation?.MaNhaXeNavigation?.TenNhaXe ?? c.BienSo)</td>
+                        <td style="font-weight:700;color:var(--primary)">@c.GiaVe.ToString("N0")₫</td>
+                        <td><span class="badge @badge">@c.TrangThai</span></td>
+                        @if (isQL)
+                        {
+                            <td>
+                                <div style="display:flex;gap:6px">
+                                    <button class="btn btn-outline btn-sm" onclick='editChuyen(@System.Text.Json.JsonSerializer.Serialize(new{ c.MaChuyen,c.MaTuyen,c.BienSo,ngayDi=c.NgayDi.ToString("yyyy-MM-dd"),gioDi=c.GioDi.ToString("HH:mm"),c.GiaVe,c.TrangThai }))'>✏️</button>
+                                    @if (c.TrangThai != "HUY")
+                                    {
+                                        <form asp-action="Huy" method="post" style="display:inline"
+                                              onsubmit="return confirm('Hủy chuyến @c.MaChuyen?')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="maChuyen" value="@c.MaChuyen"/>
+                                            <button type="submit" class="btn btn-danger btn-sm">🚫</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="admin-table-wrap">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Mã chuyến</th>
-        <th>Tuyến đường</th>
-        <th>Giờ khởi hành</th>
-        <th>Ngày đi</th>
-        <th>Nhà xe</th>
-        <th>Ghế còn</th>
-        <th>Giá vé</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>CX001</strong></td>
-        <td>Hà Nội → TP. HCM</td>
-        <td>07:00 → 21:00</td>
-        <td>27/05/2026</td>
-        <td>Phương Trang</td>
-        <td><span class="badge badge-success">12 ghế</span></td>
-        <td><strong>350.000₫</strong></td>
-        <td><span class="badge badge-info">Đang mở bán</span></td>
-        <td>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>CX002</strong></td>
-        <td>TP. HCM → Đà Lạt</td>
-        <td>08:30 → 13:00</td>
-        <td>27/05/2026</td>
-        <td>Thành Bưởi</td>
-        <td><span class="badge badge-warning">5 ghế</span></td>
-        <td><strong>180.000₫</strong></td>
-        <td><span class="badge badge-info">Đang mở bán</span></td>
-        <td>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>CX003</strong></td>
-        <td>Đà Nẵng → Hội An</td>
-        <td>06:00 → 09:00</td>
-        <td>27/05/2026</td>
-        <td>Hoàng Long</td>
-        <td><span class="badge badge-success">20 ghế</span></td>
-        <td><strong>120.000₫</strong></td>
-        <td><span class="badge badge-gray">Hoàn thành</span></td>
-        <td>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;">Xem</button>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>CX004</strong></td>
-        <td>Hà Nội → Vinh</td>
-        <td>14:00 → 22:00</td>
-        <td>27/05/2026</td>
-        <td>Kumho Samco</td>
-        <td><span class="badge badge-warning">8 ghế</span></td>
-        <td><strong>220.000₫</strong></td>
-        <td><span class="badge badge-info">Đang mở bán</span></td>
-        <td>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;margin-right:4px;">Sửa</button>
-          <button class="admin-topbar-btn" style="font-size:0.78rem;padding:4px 10px;color:#ef4444;border-color:#fca5a5;">Hủy</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+@if (isQL)
+{
+    <!-- Modal Thêm -->
+    <div class="modal-overlay" id="modal-them-chuyen">
+        <div class="modal" style="max-width:560px">
+            <div class="modal-header">
+                <h3>➕ Thêm chuyến xe mới</h3>
+                <button class="modal-close" onclick="closeModal('modal-them-chuyen')">✕</button>
+            </div>
+            <form asp-action="Them" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label class="form-label">Tuyến đường</label>
+                        <select class="form-control" name="MaTuyen" required>
+                            <option value="">-- Chọn tuyến --</option>
+                            @foreach (var t in dsTuyen)
+                            {
+                                <option value="@t.MaTuyen">@(t.MaBenDiNavigation?.TenBenXe ?? t.MaTuyen) → @(t.MaBenDenNavigation?.TenBenXe ?? "")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label class="form-label">Xe (biển số)</label>
+                        <select class="form-control" name="BienSo" required>
+                            <option value="">-- Chọn xe --</option>
+                            @foreach (var x in dsXe)
+                            {
+                                <option value="@x.BienSo">@x.BienSo — @(x.MaNhaXeNavigation?.TenNhaXe ?? "") (@x.LoaiXe)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày đi</label>
+                        <input type="date" class="form-control" name="NgayDi" required data-mintoday/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giờ đi</label>
+                        <input type="time" class="form-control" name="GioDi" required/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giá vé (VNĐ)</label>
+                        <input type="number" class="form-control" name="GiaVe" min="0" step="1000" required/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-control" name="TrangThai">
+                            <option value="SAPDI">SAPDI</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('modal-them-chuyen')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm chuyến</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Sửa -->
+    <div class="modal-overlay" id="modal-sua-chuyen">
+        <div class="modal" style="max-width:560px">
+            <div class="modal-header">
+                <h3>✏️ Chỉnh sửa chuyến xe</h3>
+                <button class="modal-close" onclick="closeModal('modal-sua-chuyen')">✕</button>
+            </div>
+            <form asp-action="Sua" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <input type="hidden" name="MaChuyen" id="sua-maChuyen"/>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label class="form-label">Tuyến đường</label>
+                        <select class="form-control" name="MaTuyen" id="sua-maTuyen" required>
+                            @foreach (var t in dsTuyen)
+                            {
+                                <option value="@t.MaTuyen">@(t.MaBenDiNavigation?.TenBenXe ?? t.MaTuyen) → @(t.MaBenDenNavigation?.TenBenXe ?? "")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label class="form-label">Xe (biển số)</label>
+                        <select class="form-control" name="BienSo" id="sua-bienso" required>
+                            @foreach (var x in dsXe)
+                            {
+                                <option value="@x.BienSo">@x.BienSo — @(x.MaNhaXeNavigation?.TenNhaXe ?? "") (@x.LoaiXe)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày đi</label>
+                        <input type="date" class="form-control" name="NgayDi" id="sua-ngaydi" required/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giờ đi</label>
+                        <input type="time" class="form-control" name="GioDi" id="sua-giodi" required/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giá vé (VNĐ)</label>
+                        <input type="number" class="form-control" name="GiaVe" id="sua-giave" min="0" step="1000" required/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-control" name="TrangThai" id="sua-trangthai">
+                            <option value="SAPDI">SAPDI</option>
+                            <option value="DANGCHAY">DANGCHAY</option>
+                            <option value="DADUNGBAI">DADUNGBAI</option>
+                            <option value="HUY">HUY</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('modal-sua-chuyen')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+<script>
+function editChuyen(data) {
+    document.getElementById('sua-maChuyen').value  = data.maChuyen;
+    document.getElementById('sua-maTuyen').value   = data.maTuyen;
+    document.getElementById('sua-bienso').value    = data.bienSo;
+    document.getElementById('sua-ngaydi').value    = data.ngayDi;
+    document.getElementById('sua-giodi').value     = data.gioDi;
+    document.getElementById('sua-giave').value     = data.giaVe;
+    document.getElementById('sua-trangthai').value = data.trangThai;
+    openModal('modal-sua-chuyen');
+}
+</script>
+}
