@@ -2,6 +2,14 @@
     ViewData["Title"] = "Báo cáo doanh thu";
     ViewData["AdminNav"] = "baocao";
     Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+
+    decimal totalRevenue = ViewBag.TotalRevenue ?? 0m;
+    int totalTickets = ViewBag.TotalTickets ?? 0;
+    int completedTrips = ViewBag.CompletedTrips ?? 0;
+    double avgRating = ViewBag.AvgRating ?? 0.0;
+    
+    // Revenue by NhaXe is dynamic list of anonymous types, we can use dynamic or cast.
+    var revenueByNhaXe = ViewBag.RevenueByNhaXe as IEnumerable<dynamic>;
 }
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
@@ -34,24 +42,24 @@
 <div class="stat-cards">
   <div class="stat-card">
     <div class="stat-card-icon" style="background:#f0fdf4;color:#10b981;">💰</div>
-    <div class="stat-card-value">1.25 tỷ₫</div>
+    <div class="stat-card-value">@totalRevenue.ToString("N0")₫</div>
     <div class="stat-card-label">Tổng doanh thu</div>
-    <div class="stat-card-trend trend-up">↑ 15% so với kỳ trước</div>
+    <div class="stat-card-trend trend-up">↑ Tăng trưởng tốt</div>
   </div>
   <div class="stat-card">
     <div class="stat-card-icon" style="background:#eff6ff;color:#3b82f6;">🎫</div>
-    <div class="stat-card-value">3,560</div>
+    <div class="stat-card-value">@totalTickets</div>
     <div class="stat-card-label">Tổng vé bán</div>
-    <div class="stat-card-trend trend-up">↑ 8% so với kỳ trước</div>
+    <div class="stat-card-trend trend-up">↑ Tăng trưởng tốt</div>
   </div>
   <div class="stat-card">
     <div class="stat-card-icon" style="background:#fef3c7;color:#f59e0b;">🚌</div>
-    <div class="stat-card-value">890</div>
+    <div class="stat-card-value">@completedTrips</div>
     <div class="stat-card-label">Chuyến hoàn thành</div>
   </div>
   <div class="stat-card">
     <div class="stat-card-icon" style="background:#fdf4ff;color:#9333ea;">⭐</div>
-    <div class="stat-card-value">4.5</div>
+    <div class="stat-card-value">@avgRating.ToString("0.0") / 5</div>
     <div class="stat-card-label">Đánh giá trung bình</div>
   </div>
 </div>
@@ -73,62 +81,32 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td><strong>Phương Trang</strong></td>
-        <td>320</td>
-        <td>1,280</td>
-        <td><strong style="color:#10b981;">480,000,000₫</strong></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
-              <div style="height:100%;background:#3b82f6;width:38.4%;"></div>
-            </div>
-            <span style="font-size:0.8rem;font-weight:600;color:#64748b;">38.4%</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Thành Bưởi</strong></td>
-        <td>240</td>
-        <td>960</td>
-        <td><strong style="color:#10b981;">320,000,000₫</strong></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
-              <div style="height:100%;background:#10b981;width:25.6%;"></div>
-            </div>
-            <span style="font-size:0.8rem;font-weight:600;color:#64748b;">25.6%</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Hoàng Long</strong></td>
-        <td>200</td>
-        <td>800</td>
-        <td><strong style="color:#10b981;">280,000,000₫</strong></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
-              <div style="height:100%;background:#f59e0b;width:22.4%;"></div>
-            </div>
-            <span style="font-size:0.8rem;font-weight:600;color:#64748b;">22.4%</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Kumho Samco</strong></td>
-        <td>130</td>
-        <td>520</td>
-        <td><strong style="color:#10b981;">170,000,000₫</strong></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
-              <div style="height:100%;background:#9333ea;width:13.6%;"></div>
-            </div>
-            <span style="font-size:0.8rem;font-weight:600;color:#64748b;">13.6%</span>
-          </div>
-        </td>
-      </tr>
+      @if(revenueByNhaXe != null)
+      {
+          foreach(var r in revenueByNhaXe)
+          {
+              <tr>
+                  <td><strong>@r.TenNhaXe</strong></td>
+                  <td>--</td>
+                  <td>@r.SoVeBan</td>
+                  <td>@((r.DoanhThu as decimal?)?.ToString("N0") ?? "0")₫</td>
+                  <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                          <div style="flex:1;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+                              <div style="height:100%;width:@(((decimal)r.TyLe).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))%;background:#3b82f6;"></div>
+                          </div>
+                          <span style="font-size:0.85rem;color:#64748b;width:35px;text-align:right;">@(((decimal)r.TyLe).ToString("0.0"))%</span>
+                      </div>
+                  </td>
+              </tr>
+          }
+      }
+      else
+      {
+          <tr>
+            <td colspan="5" style="text-align:center; padding:40px; color:#94a3b8;">Chưa có dữ liệu doanh thu.</td>
+          </tr>
+      }
     </tbody>
   </table>
 </div>

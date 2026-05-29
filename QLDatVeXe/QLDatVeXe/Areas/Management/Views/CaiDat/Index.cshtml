@@ -15,19 +15,20 @@
 <div style="display:grid;grid-template-columns:1fr;gap:24px;max-width:800px;">
   <!-- Thông tin website -->
   <div style="background:white;border-radius:16px;border:1px solid #f1f5f9;padding:24px;">
+    <!-- TODO: Load settings from DB (CAUHINH / SETTINGS table) -->
     <h3 style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:20px;">🌐 Thông tin website</h3>
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div>
         <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Tên website</label>
-        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="BusGo" />
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="" placeholder="Đang tải..." />
       </div>
       <div>
         <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Hotline hỗ trợ</label>
-        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="1900 1234" />
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="" placeholder="Đang tải..." />
       </div>
       <div>
         <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Email hỗ trợ</label>
-        <input type="email" class="form-control" style="width:100%;max-width:400px;" value="support@busgo.vn" />
+        <input type="email" class="form-control" style="width:100%;max-width:400px;" value="" placeholder="Đang tải..." />
       </div>
     </div>
   </div>
@@ -38,15 +39,12 @@
     <div style="display:flex;flex-direction:column;gap:16px;">
       <div>
         <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Tài khoản ngân hàng nhận tiền</label>
-        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="Vietcombank - 0123456789 - CÔNG TY BUSGO" />
+        <input type="text" class="form-control" style="width:100%;max-width:400px;" value="" placeholder="Đang tải..." />
       </div>
       <div>
         <label style="display:block;font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">Thời gian giữ ghế (chờ thanh toán)</label>
         <select class="form-control" style="width:100%;max-width:200px;">
-          <option>5 phút</option>
-          <option selected>10 phút</option>
-          <option>15 phút</option>
-          <option>30 phút</option>
+          <option value="">Đang tải...</option>
         </select>
       </div>
     </div>
