@@ -1,0 +1,87 @@
+@using QLDatVeXe.Helpers
+@using QLDatVeXe.Domain.Enums
+@{
+    var currentUser = SessionHelper.GetCurrentUser(Context.Session);
+    var pageTitle   = ViewBag.Title    as string ?? "Nhân viên — BusGo";
+    var pageName    = ViewBag.PageName as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@pageTitle</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/staff.css" asp-append-version="true"/>
+</head>
+<body>
+<div class="admin-layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <span>🚌</span> <span>BusGo</span>
+        </div>
+        <div class="sidebar-role">Cổng Nhân Viên</div>
+        <div class="sidebar-nav">
+            <div class="nav-section">Tổng quan</div>
+            <a asp-area="management" asp-controller="NhanVien" asp-action="Index"
+               class="nav-item @(pageName == "NVHome" ? "active" : "")">
+                <span class="icon">🏠</span> Trang chủ
+            </a>
+
+            <div class="nav-section" style="margin-top:8px">Nghiệp vụ</div>
+            <a asp-area="management" asp-controller="NhanVien" asp-action="TimChuyen"
+               class="nav-item @(pageName == "TimChuyen" ? "active" : "")">
+                <span class="icon">🎫</span> Đặt vé hộ khách
+            </a>
+            <a asp-area="management" asp-controller="NhanVien" asp-action="XemKhachHang"
+               class="nav-item @(pageName == "XemKH" ? "active" : "")">
+                <span class="icon">👥</span> Khách hàng
+            </a>
+            <a asp-area="management" asp-controller="NhanVien" asp-action="XemNhaxe"
+               class="nav-item @(pageName == "XemNhaXe" ? "active" : "")">
+                <span class="icon">🏢</span> Nhà xe
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">@(currentUser?.HoTen?.Length > 0 ? currentUser.HoTen[0].ToString().ToUpper() : "N")</div>
+                <div>
+                    <div class="user-name">@(currentUser?.HoTen ?? "Nhân viên")</div>
+                    <div class="user-role">Nhân viên</div>
+                </div>
+            </div>
+            <form asp-area="" asp-controller="TaiKhoan" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-ghost btn-sm" style="color:#94a3b8;width:100%;margin-top:8px">🚪 Đăng xuất</button>
+            </form>
+        </div>
+    </nav>
+    <!-- MAIN -->
+    <main class="admin-main">
+        <div class="admin-header">
+            <div class="admin-page-title">
+                @(pageName switch {
+                    "NVHome"    => "🏠 Trang chủ",
+                    "TimChuyen" => "🎫 Đặt vé hộ khách",
+                    "XemKH"     => "👥 Khách hàng",
+                    "XemNhaXe"  => "🏢 Nhà xe",
+                    _           => pageTitle
+                })
+            </div>
+            <div style="font-size:.8rem;color:#94a3b8">@DateTime.Now.ToString("HH:mm — dd/MM/yyyy")</div>
+        </div>
+        <div class="admin-content">
+            @if (TempData["Success"] is string msg)
+            { <div class="alert alert-success" data-autodismiss>✅ @msg</div> }
+            @if (TempData["Error"] is string err)
+            { <div class="alert alert-danger" data-autodismiss>⚠️ @err</div> }
+            @RenderBody()
+        </div>
+    </main>
+</div>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
