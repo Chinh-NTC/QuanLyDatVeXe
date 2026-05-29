@@ -25,24 +25,13 @@ function buildDateNav() {
   const nav = document.createElement('div');
   nav.className = 'date-nav';
   
+  // Try to use the searched date if available, otherwise today
   const searchParams = new URLSearchParams(window.location.search);
-  const dateInput = document.getElementById('sbc-ngay-di');
-  let baseDateStr = dateInput ? dateInput.value : searchParams.get('ngayDi');
+  let baseDateStr = searchParams.get('ngayDi');
   let baseDate = new Date();
   if (baseDateStr) {
-    let parts = baseDateStr.split('-');
-    if (parts.length === 3) {
-      baseDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    } else if (baseDateStr.includes('/')) {
-      parts = baseDateStr.split('/');
-      if (parts.length === 3) {
-          // dd/MM/yyyy
-          baseDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      }
-    }
-  }
-  if (isNaN(baseDate.getTime())) {
-      baseDate = new Date(); // fallback to today if invalid
+    const parts = baseDateStr.split('-');
+    baseDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   }
   baseDate.setHours(0,0,0,0);
 
@@ -175,28 +164,22 @@ function renderResults() {
         <div class="trc-img-badge">${t.loaiXe || 'Xe khách'}</div>
       </div>
       <div class="trc-main">
-        <div class="trc-info" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 4px 0;">
-          <div style="display: flex; align-items: center; justify-content: center; flex: 1;">
-            <div style="display:flex; flex-direction:column; gap:2px; align-items:center; flex:1; max-width: 140px;">
-              <span class="trc-time" style="font-size: 1.1rem; font-weight: 700;">${t.gioDiShort}</span>
-              <span style="font-weight:600; font-size:0.8rem; text-align:center; line-height:1.2;">${t.tinhDi}</span>
-              <span style="font-size:0.7rem; color:var(--gray-500); line-height:1.2; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;" title="${t.benDi}">(${t.benDi})</span>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; align-items:center; gap: 0; padding: 0 12px;">
-                <span class="trc-duration" style="font-size: 0.7rem; color: #64748b;">${formatDuration(t.thoiGian)}</span>
-                <span class="trc-arrow" style="font-size: 1rem; color: #cbd5e1; margin-top:-2px;">→</span>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; gap:2px; align-items:center; flex:1; max-width: 140px;">
-              <span class="trc-time trc-time-dest" style="font-size: 1.1rem; font-weight: 700; color: #64748b;">${t.gioDenShort}</span>
-              <span style="font-weight:600; font-size:0.8rem; text-align:center; line-height:1.2;">${t.tinhDen}</span>
-              <span style="font-size:0.7rem; color:var(--gray-500); line-height:1.2; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;" title="${t.benDen}">(${t.benDen})</span>
-            </div>
+        <div class="trc-info">
+          <div class="trc-time-row">
+            <span class="trc-time">${t.gioDiShort}</span>
+            <span class="trc-arrow">→</span>
+            <span class="trc-time trc-time-dest">${t.gioDenShort}</span>
+            <span class="trc-duration">${formatDuration(t.thoiGian)}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px; margin-top: auto;">
-            <span class="trc-carrier-name" style="font-weight: 600; font-size: 0.8rem; color: var(--gray-600); max-width: 250px;" title="${t.tenNhaXe}">Nhà xe ${t.tenNhaXe}</span>
-            <span class="trc-date-tag" style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; color: var(--primary);">📅 Ngày đi: ${formatDate(t.ngayDi)}</span>
+          <div class="trc-station-row">
+            <span class="trc-station" title="${t.benDi}">${t.benDi}</span>
+            <span class="trc-station-sep">→</span>
+            <span class="trc-station" title="${t.benDen}">${t.benDen}</span>
+          </div>
+          <div class="trc-carrier-row">
+            <span class="trc-carrier-name" title="${t.tenNhaXe}">🏢 ${t.tenNhaXe}</span>
+            <span class="trc-dot">●</span>
+            <span class="trc-date-tag">📅 ${formatDate(t.ngayDi)}</span>
           </div>
         </div>
 

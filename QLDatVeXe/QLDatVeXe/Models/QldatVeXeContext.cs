@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -354,6 +354,7 @@ public partial class QldatVeXeContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("tenDangNhap");
+            entity.Property(e => e.Trangthai).HasColumnName("trangthai");
         });
 
         modelBuilder.Entity<Khuyenmai>(entity =>

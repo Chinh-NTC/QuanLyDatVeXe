@@ -183,25 +183,34 @@ function proceedToPayment() {
   if (!sdt)   { showToast('Vui lòng nhập số điện thoại',     'warning'); return; }
 
   const ghiChu = document.getElementById('input-ghichu')?.value || '';
-
-  // Chuyển sang trang thanh toán qua GET với query string (bao gồm đầy đủ thông tin chuyến)
-  const maGhesStr = selectedSeats.map(s => s.maGhe).join(',');
-  const soGhesStr = selectedSeats.map(s => s.soGhe).join(',');
   
-  const params = new URLSearchParams({
-    maChuyen: tripData.maChuyen,
-    maGhes:   maGhesStr,
-    soGhes:   soGhesStr,
-    ghiChu:   ghiChu,
-    giaVe:    tripData.giaVe    || 0,
-    gioDi:    tripData.gioDi    || '',
-    benDi:    tripData.benDi    || '',
-    benDen:   tripData.benDen   || '',
-    ngayDi:   tripData.ngayDi   || '',
-    tenNhaXe: tripData.tenNhaXe || ''
+  // Submit via POST to /booking
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = (window.CTX || '') + '/booking';
+  
+  const inputChuyen = document.createElement('input');
+  inputChuyen.type = 'hidden';
+  inputChuyen.name = 'maChuyen';
+  inputChuyen.value = tripData.maChuyen;
+  form.appendChild(inputChuyen);
+  
+  selectedSeats.forEach(seat => {
+    const inputGhe = document.createElement('input');
+    inputGhe.type = 'hidden';
+    inputGhe.name = 'maGhes';
+    inputGhe.value = seat.maGhe;
+    form.appendChild(inputGhe);
   });
-
-  window.location.href = (window.CTX || '') + '/Payment?' + params.toString();
+  
+  const inputGhiChu = document.createElement('input');
+  inputGhiChu.type = 'hidden';
+  inputGhiChu.name = 'ghiChu';
+  inputGhiChu.value = ghiChu;
+  form.appendChild(inputGhiChu);
+  
+  document.body.appendChild(form);
+  form.submit();
 }
 
 document.addEventListener('DOMContentLoaded', initBooking);

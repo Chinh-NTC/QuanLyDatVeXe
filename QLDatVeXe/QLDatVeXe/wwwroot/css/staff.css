@@ -1,0 +1,168 @@
+/* =========================================================
+   staff.css — Giao diện riêng cho nhân viên (BusGo)
+   ========================================================= */
+
+/* ── Modal overlay ─────────────────────────────────────── */
+.staff-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+}
+
+.staff-modal {
+    background: white; border-radius: 20px;
+    width: 100%; max-width: 640px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,.25);
+    animation: modalIn .2s ease;
+}
+
+@keyframes modalIn {
+    from { opacity:0; transform: translateY(-20px) scale(.97); }
+    to   { opacity:1; transform: translateY(0)     scale(1);   }
+}
+
+.staff-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    flex-shrink: 0;
+}
+.staff-modal-header h3 {
+    font-size: 1.1rem; font-weight: 700; margin: 0; color: #1e293b;
+}
+
+.modal-close {
+    background: #f1f5f9; border: none; width: 30px; height: 30px;
+    border-radius: 50%; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+}
+.modal-close:hover { background: #fee2e2; color: #dc2626; }
+
+.staff-modal-body {
+    padding: 20px 24px; overflow-y: auto; flex: 1;
+}
+
+/* Trip info banner inside modal */
+.modal-trip-info {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; color: white;
+}
+.modal-trip-route { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.modal-trip-meta  { font-size: .82rem; opacity: .85; }
+
+.modal-section { margin-bottom: 20px; }
+
+/* ── Danh sách khách hàng trong modal ──────────────────── */
+.kh-list-scroll {
+    max-height: 180px; overflow-y: auto;
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 4px 0;
+}
+
+.kh-radio-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; cursor: pointer;
+    transition: background .15s; border-radius: 0;
+}
+.kh-radio-item:hover { background: #f8fafc; }
+.kh-radio-item input[type=radio] { accent-color: #2563eb; flex-shrink: 0; }
+
+.kh-radio-avatar {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: white; font-size: .8rem;
+}
+
+/* ── Chọn ghế ───────────────────────────────────────────── */
+.ghe-tang-label {
+    font-size: .78rem; font-weight: 700; text-transform: uppercase;
+    color: #64748b; letter-spacing: .05em; margin: 10px 0 6px;
+}
+
+.ghe-grid {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+}
+
+.ghe-item {
+    min-width: 42px; height: 36px; border-radius: 8px; padding: 0 8px;
+    border: 2px solid #e2e8f0; font-size: .8rem; font-weight: 600;
+    color: #1e293b; background: white; transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none;
+}
+
+.ghe-item input[type=radio] { display: none; }
+
+.ghe-item:has(input:checked) {
+    background: #2563eb; color: white; border-color: #2563eb;
+    box-shadow: 0 2px 8px rgba(37,99,235,.35);
+}
+
+.ghe-item:hover:not(.ghe-dadat) {
+    border-color: #2563eb; color: #2563eb;
+}
+
+.ghe-dadat {
+    background: #f1f5f9; color: #94a3b8;
+    border-color: #e2e8f0; cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* ── Nhà xe card grid ───────────────────────────────────── */
+.nhaxe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 4px 0;
+}
+
+.nhaxe-card {
+    background: white; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    transition: transform .2s, box-shadow .2s;
+    border: 1px solid #f1f5f9;
+}
+.nhaxe-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.12);
+}
+
+.nhaxe-banner {
+    height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+}
+
+.nhaxe-logo-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; font-weight: 800; color: white;
+    border: 2px solid rgba(255,255,255,.4);
+}
+
+.nhaxe-body { padding: 16px; }
+
+.nhaxe-name {
+    font-size: 1rem; font-weight: 700; color: #1e293b;
+    margin: 0 0 10px; line-height: 1.3;
+}
+
+.nhaxe-meta {
+    display: flex; flex-direction: column; gap: 4px;
+    font-size: .8rem; color: #64748b; margin-bottom: 12px;
+}
+
+.nhaxe-stats {
+    display: flex; gap: 12px; padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.nhaxe-stat { text-align: center; }
+.nhaxe-stat-val { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+.nhaxe-stat-lbl { font-size: .72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; }

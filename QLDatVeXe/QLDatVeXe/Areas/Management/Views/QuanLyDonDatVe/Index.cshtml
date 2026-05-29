@@ -1,80 +1,109 @@
-@model List<QLDatVeXe.Models.Dondatve>
+@using QLDatVeXe.Models
 @{
-    ViewBag.Title = "Quản lý đơn hàng";
-    ViewBag.PageName = "DonHang";
-    var filterTT = ViewBag.TrangThai as string ?? "";
+    ViewData["Title"] = "Quản lý Đơn đặt vé";
+    ViewData["AdminNav"] = "donhang";
+    Layout = "~/Areas/Management/Views/Shared/_AdminLayout.cshtml";
+
+    var donDatVes = ViewBag.DonDatVes as List<Dondatve>;
+    int total = donDatVes?.Count ?? 0;
+    int pending = donDatVes?.Count(d => d.TrangThai == "Chờ thanh toán") ?? 0;
+    int confirmed = donDatVes?.Count(d => d.TrangThai == "Đã thanh toán" || d.TrangThai == "Hoàn thành") ?? 0;
+    int cancelled = donDatVes?.Count(d => d.TrangThai == "Đã hủy") ?? 0;
 }
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-    <h2 style="font-size:1.2rem;font-weight:700">Danh sách đơn hàng (@Model.Count)</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+  <div>
+    <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b;">🎫 Danh sách Đơn đặt vé</h2>
+    <p style="color:#64748b;font-size:0.88rem;margin-top:4px;">Quản lý tất cả đơn đặt vé của khách hàng</p>
+  </div>
+  <button class="admin-topbar-btn">📥 Xuất Excel</button>
 </div>
 
-<div class="panel">
-    <div class="filter-bar">
-        <a asp-action="Index" class="btn btn-sm @(string.IsNullOrEmpty(filterTT) ? "btn-primary" : "btn-ghost")">Tất cả</a>
-        <a asp-action="Index" asp-route-trangThai="CHOXULY"   class="btn btn-sm @(filterTT=="CHOXULY"?"btn-primary":"btn-ghost")">⏳ Chờ xử lý</a>
-        <a asp-action="Index" asp-route-trangThai="THANHCONG" class="btn btn-sm @(filterTT=="THANHCONG"?"btn-primary":"btn-ghost")">✅ Thành công</a>
-        <a asp-action="Index" asp-route-trangThai="DAHUY"     class="btn btn-sm @(filterTT=="DAHUY"?"btn-primary":"btn-ghost")">❌ Đã hủy</a>
-    </div>
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã đơn</th>
-                    <th>Khách hàng</th>
-                    <th>Người đi</th>
-                    <th>Số ghế</th>
-                    <th>Tổng tiền</th>
-                    <th>Ngày đặt</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var d in Model)
-                {
-                    var badge = d.TrangThai switch {
-                        "THANHCONG" => "badge-green",
-                        "CHOXULY"   => "badge-yellow",
-                        "DAHUY"     => "badge-red",
-                        _ => "badge-gray"
-                    };
-                    <tr>
-                        <td><span class="badge badge-blue">@d.MaDon</span></td>
-                        <td>
-                            <div style="font-weight:600">@(d.MaKhNavigation?.HoTen ?? "—")</div>
-                            <div style="font-size:.75rem;color:var(--gray-400)">@d.MaKh</div>
-                        </td>
-                        <td>
-                            <div>@d.Tennguoidi</div>
-                            <div style="font-size:.75rem;color:var(--gray-400)">@d.Sdtnguoidi</div>
-                        </td>
-                        <td>@d.Chitietdatve.Count ghế</td>
-                        <td style="font-weight:700;color:var(--primary)">@d.TongTien?.ToString("N0")₫</td>
-                        <td>@d.NgayDat?.ToString("dd/MM/yy HH:mm")</td>
-                        <td><span class="badge @badge">@d.TrangThai</span></td>
-                        <td>
-                            <div style="display:flex;gap:6px">
-                                <a asp-action="ChiTiet" asp-route-maDon="@d.MaDon" class="btn btn-outline btn-sm">👁</a>
-                                @if (d.TrangThai == "CHOXULY")
-                                {
-                                    <form asp-action="DuyetDon" method="post" style="display:inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="maDon" value="@d.MaDon"/>
-                                        <button type="submit" class="btn btn-success btn-sm" title="Duyệt">✅</button>
-                                    </form>
-                                    <form asp-action="HuyDon" method="post" style="display:inline"
-                                          onsubmit="return confirm('Hủy đơn @d.MaDon?')">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="maDon" value="@d.MaDon"/>
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Hủy">❌</button>
-                                    </form>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+<!-- STAT MINI -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+  <div style="background:white;border-radius:12px;padding:16px;border:1px solid #f1f5f9;text-align:center;">
+    <div style="font-size:1.5rem;font-weight:800;color:#3b82f6;">@total</div>
+    <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">Tổng đơn</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;border:1px solid #f1f5f9;text-align:center;">
+    <div style="font-size:1.5rem;font-weight:800;color:#f59e0b;">@pending</div>
+    <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">Chờ thanh toán</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;border:1px solid #f1f5f9;text-align:center;">
+    <div style="font-size:1.5rem;font-weight:800;color:#10b981;">@confirmed</div>
+    <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">Đã thanh toán</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;border:1px solid #f1f5f9;text-align:center;">
+    <div style="font-size:1.5rem;font-weight:800;color:#ef4444;">@cancelled</div>
+    <div style="font-size:0.8rem;color:#64748b;margin-top:4px;">Đã hủy</div>
+  </div>
+</div>
+
+<!-- FILTER -->
+<div style="background:white;border-radius:12px;padding:16px 20px;border:1px solid #f1f5f9;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+  <select class="form-control" style="width:auto;">
+    <option>Tất cả trạng thái</option>
+    <option>Chờ xử lý</option>
+    <option>Đã xác nhận</option>
+    <option>Hoàn thành</option>
+    <option>Đã hủy</option>
+  </select>
+  <input type="date" class="form-control" style="width:auto;" />
+  <input type="text" class="form-control" style="flex:1;min-width:200px;" placeholder="🔍 Tìm mã đơn, tên khách..." />
+  <button class="admin-topbar-btn">Lọc</button>
+</div>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Mã đơn</th>
+        <th>Khách hàng</th>
+        <th>SĐT</th>
+        <th>Tuyến đường</th>
+        <th>Ngày đặt</th>
+        <th>Ghế</th>
+        <th>Tổng tiền</th>
+        <th>Thanh toán</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if(donDatVes != null && donDatVes.Count > 0)
+      {
+          foreach(var o in donDatVes)
+          {
+              string statusClass = "badge-gray";
+              if(o.TrangThai == "Đã thanh toán" || o.TrangThai == "Hoàn thành") statusClass = "badge-success";
+              if(o.TrangThai == "Đã hủy") statusClass = "badge-danger";
+              if(o.TrangThai == "Chờ thanh toán") statusClass = "badge-warning";
+              
+              <tr>
+                <td><strong>@o.MaDon</strong></td>
+                <td>@o.MaKhNavigation?.HoTen</td>
+                <td>@o.Sdtnguoidi</td>
+                <td>(Khớp với CSDL)</td>
+                <td>@o.NgayDat?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>(DB)</td>
+                <td>@o.TongTien?.ToString("N0")₫</td>
+                <td>--</td>
+                <td><span class="badge @statusClass">@o.TrangThai</span></td>
+                <td>
+                  <a href="#" class="btn btn-outline" style="padding:4px 8px;font-size:0.8rem">Sửa</a>
+                </td>
+              </tr>
+          }
+      }
+      else
+      {
+          <tr>
+            <td colspan="10" style="text-align:center; padding:40px; color:#94a3b8;">
+              <div style="font-size:2rem; margin-bottom:10px;">🎫</div>
+              <div>Chưa có dữ liệu đơn đặt vé</div>
+            </td>
+          </tr>
+      }
+    </tbody>
+  </table>
 </div>

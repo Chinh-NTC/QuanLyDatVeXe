@@ -1,0 +1,327 @@
+@model QLDatVeXe.Models.Khachhang
+@{
+    ViewBag.Title = "Quản lý tài khoản — BusGo";
+    var lichSu = ViewBag.LichSu as List<QLDatVeXe.Models.Dondatve> ?? new List<QLDatVeXe.Models.Dondatve>();
+    var danhGia = ViewBag.DanhGia as List<QLDatVeXe.Models.Danhgia> ?? new List<QLDatVeXe.Models.Danhgia>();
+
+    string TrangThaiBadge(string? t) => t switch {
+        "THANHCONG" => "badge-green",
+        "CHOXULY"   => "badge-yellow",
+        "DAHUY"     => "badge-red",
+        _           => "badge-gray"
+    };
+    string TrangThaiLabel(string? t) => t switch {
+        "THANHCONG" => "✅ Thành công",
+        "CHOXULY"   => "⏳ Chờ xử lý",
+        "DAHUY"     => "❌ Đã hủy",
+        _           => t ?? ""
+    };
+}
+
+<style>
+    .account-layout {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .account-sidebar {
+        width: 250px;
+        flex-shrink: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        padding: 1.5rem 0;
+        align-self: flex-start;
+    }
+    .account-sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .account-sidebar li {
+        margin-bottom: 0.5rem;
+    }
+    .account-sidebar a {
+        display: block;
+        padding: 0.75rem 1.5rem;
+        color: var(--gray-600);
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .account-sidebar a:hover, .account-sidebar a.active {
+        color: var(--primary);
+        background: #f8fafc;
+        border-left-color: var(--primary);
+    }
+    .account-content {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        padding: 2rem;
+        min-height: 500px;
+    }
+    .tab-pane {
+        display: none;
+    }
+    .tab-pane.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    @@media (max-width: 768px) {
+        .account-layout {
+            flex-direction: column;
+        }
+        .account-sidebar {
+            width: 100%;
+        }
+    }
+</style>
+
+<section class="section">
+    <div class="container">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0">Hồ sơ cá nhân</h1>
+        <p style="color:var(--gray-500);margin-top:4px">Quản lý thông tin, lịch sử mua vé và đánh giá của bạn</p>
+
+        <div class="account-layout">
+            <aside class="account-sidebar">
+                <ul>
+                    <li><a href="#" class="tab-link active" data-target="#tab-profile">👤 Thông tin tài khoản</a></li>
+                    <li><a href="#" class="tab-link" data-target="#tab-history">🎫 Lịch sử đặt vé</a></li>
+                    <li><a href="#" class="tab-link" data-target="#tab-reviews">⭐ Đánh giá của tôi</a></li>
+                    <li style="border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                        <form asp-controller="TaiKhoan" asp-action="Logout" method="post" id="logoutForm">
+                            <a href="#" onclick="document.getElementById('logoutForm').submit()" style="color: var(--danger)">🚪 Đăng xuất</a>
+                        </form>
+                    </li>
+                </ul>
+            </aside>
+
+            <main class="account-content">
+                <!-- TAB: THÔNG TIN TÀI KHOẢN -->
+                <div id="tab-profile" class="tab-pane active">
+                    <h2 style="margin-bottom:1.5rem;font-size:1.4rem">Thông tin tài khoản</h2>
+                    
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success" style="padding:1rem;background:#dcfce7;color:#166534;border-radius:8px;margin-bottom:1.5rem">
+                            @TempData["Success"]
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger" style="padding:1rem;background:#fee2e2;color:#b91c1c;border-radius:8px;margin-bottom:1.5rem">
+                            @TempData["Error"]
+                        </div>
+                    }
+
+                    <form asp-controller="TaiKhoan" asp-action="UpdateProfile" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Tên đăng nhập (Không thể đổi)</label>
+                            <input type="text" class="form-control" value="@Model.TenDangNhap" disabled style="background:#f1f5f9" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" asp-for="HoTen" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" asp-for="Sdt" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giới tính</label>
+                            <select class="form-control" asp-for="GioiTinh">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mật khẩu mới (Để trống nếu không đổi)</label>
+                            <input type="password" class="form-control" asp-for="MatKhau" value="" placeholder="Nhập mật khẩu mới..." />
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="margin-top:1rem">💾 Lưu thay đổi</button>
+                    </form>
+                </div>
+
+                <!-- TAB: LỊCH SỬ ĐẶT VÉ -->
+                <div id="tab-history" class="tab-pane">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                        <h2 style="font-size:1.4rem;margin:0">Lịch sử đặt vé</h2>
+                        <a asp-controller="DatVe" asp-action="ChonChuyen" class="btn btn-sm btn-outline">+ Đặt vé mới</a>
+                    </div>
+
+                    @if (!lichSu.Any())
+                    {
+                        <div style="text-align:center;padding:40px 0">
+                            <div style="font-size:3rem;margin-bottom:16px">📭</div>
+                            <h3 style="color:var(--gray-600);margin-bottom:8px">Chưa có đơn đặt vé nào</h3>
+                            <a asp-controller="DatVe" asp-action="ChonChuyen" class="btn btn-primary mt-3">🔍 Tìm chuyến xe ngay</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="display:flex;flex-direction:column;gap:16px">
+                            @foreach (var don in lichSu)
+                            {
+                                var ct = don.Chitietdatve.FirstOrDefault();
+                                var cx = ct?.MaChuyenNavigation;
+                                <div class="card" style="overflow:visible;border:1px solid #e2e8f0;box-shadow:none">
+                                    <div class="card-body">
+                                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+                                            <div>
+                                                <span class="badge badge-blue" style="margin-bottom:6px">@don.MaDon</span>
+                                                <div style="font-size:.85rem;color:var(--gray-500)">
+                                                    🕐 @don.NgayDat?.ToString("dd/MM/yyyy HH:mm")
+                                                </div>
+                                            </div>
+                                            <span class="badge @TrangThaiBadge(don.TrangThai)" style="font-size:.8rem;padding:4px 12px">
+                                                @TrangThaiLabel(don.TrangThai)
+                                            </span>
+                                        </div>
+
+                                        @if (cx?.MaTuyenNavigation is not null)
+                                        {
+                                            <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:white;border-radius:12px;padding:16px 20px;margin-bottom:14px">
+                                                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                                                    <div style="text-align:center">
+                                                        <div style="font-size:1.3rem;font-weight:800">@cx.GioDi.ToString("HH:mm")</div>
+                                                        <div style="font-size:.8rem;opacity:.85">@cx.MaTuyenNavigation.MaBenDiNavigation?.MaPhuongNoNavigation?.MaTinhNoNavigation?.TenTinh (@cx.MaTuyenNavigation.MaBenDiNavigation?.TenBenXe)</div>
+                                                    </div>
+                                                    <div style="flex:1;text-align:center;font-size:.9rem">🚌 →</div>
+                                                    <div style="text-align:center">
+                                                        <div style="font-size:1.3rem;font-weight:800">@cx.GioDi.AddMinutes(cx.MaTuyenNavigation.ThoiGianDuKien).ToString("HH:mm")</div>
+                                                        <div style="font-size:.8rem;opacity:.85">@cx.MaTuyenNavigation.MaBenDenNavigation?.MaPhuongNoNavigation?.MaTinhNoNavigation?.TenTinh (@cx.MaTuyenNavigation.MaBenDenNavigation?.TenBenXe)</div>
+                                                    </div>
+                                                    <div style="border-left:1px solid rgba(255,255,255,.2);padding-left:16px">
+                                                        <div style="font-size:.75rem;opacity:.7">Ngày đi</div>
+                                                        <div style="font-weight:700">@cx.NgayDi.ToString("dd/MM/yyyy")</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.875rem;margin-bottom:12px">
+                                            <div><span style="color:var(--gray-400)">👤 Người đi:</span> <strong>@don.Tennguoidi</strong></div>
+                                            <div><span style="color:var(--gray-400)">📞 SĐT:</span> <strong>@don.Sdtnguoidi</strong></div>
+                                            <div><span style="color:var(--gray-400)">🪑 Số ghế:</span> <strong>@don.Chitietdatve.Count</strong></div>
+                                            @if (!string.IsNullOrEmpty(don.GhiChu))
+                                            {
+                                                <div><span style="color:var(--gray-400)">📝 Ghi chú:</span> @don.GhiChu</div>
+                                            }
+                                        </div>
+
+                                        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--gray-200);padding-top:14px;flex-wrap:wrap;gap:10px">
+                                            <div style="font-size:1.2rem;font-weight:800;color:var(--primary)">
+                                                💰 @don.TongTien?.ToString("N0")₫
+                                            </div>
+                                            <div style="display:flex;gap:8px">
+                                                @if (don.TrangThai == "CHOXULY")
+                                                {
+                                                    <form asp-controller="DatVe" asp-action="HuyDon" method="post"
+                                                          onsubmit="return confirm('Bạn có chắc muốn hủy đơn @don.MaDon?')">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="maDon" value="@don.MaDon"/>
+                                                        <button type="submit" class="btn btn-danger btn-sm">❌ Hủy đơn</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- TAB: ĐÁNH GIÁ CỦA TÔI -->
+                <div id="tab-reviews" class="tab-pane">
+                    <h2 style="margin-bottom:1.5rem;font-size:1.4rem">Đánh giá của tôi</h2>
+                    
+                    @if (!danhGia.Any())
+                    {
+                        <div style="text-align:center;padding:40px 0">
+                            <div style="font-size:3rem;margin-bottom:16px">⭐</div>
+                            <h3 style="color:var(--gray-600)">Chưa có đánh giá nào</h3>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="display:flex;flex-direction:column;gap:16px">
+                            @foreach (var dg in danhGia)
+                            {
+                                var cx = dg.MaChuyenNavigation;
+                                <div class="card" style="border:1px solid #e2e8f0;box-shadow:none">
+                                    <div class="card-body">
+                                        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                                            <div>
+                                                <div style="font-weight:600;color:var(--gray-800)">
+                                                    Chuyến: @cx?.MaTuyenNavigation?.MaBenDiNavigation?.MaPhuongNoNavigation?.MaTinhNoNavigation?.TenTinh (@cx?.MaTuyenNavigation?.MaBenDiNavigation?.TenBenXe) → @cx?.MaTuyenNavigation?.MaBenDenNavigation?.MaPhuongNoNavigation?.MaTinhNoNavigation?.TenTinh (@cx?.MaTuyenNavigation?.MaBenDenNavigation?.TenBenXe)
+                                                </div>
+                                                <div style="font-size:0.8rem;color:var(--gray-500)">Ngày đi: @cx?.NgayDi.ToString("dd/MM/yyyy")</div>
+                                            </div>
+                                            <div style="color:#fbbf24;font-size:1.2rem">
+                                                @for (int i=1; i<=5; i++)
+                                                {
+                                                    if (i <= dg.DiemDanhGia) { <span>★</span> }
+                                                    else { <span style="color:#e2e8f0">★</span> }
+                                                }
+                                            </div>
+                                        </div>
+                                        <p style="margin:0;font-size:0.95rem;color:var(--gray-700)">"@dg.BinhLuan"</p>
+                                        <div style="font-size:0.75rem;color:var(--gray-400);margin-top:8px;text-align:right">
+                                            Đã đánh giá vào: @dg.NgayDanhGia?.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-link');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            // Handle URL hash to open correct tab
+            if (window.location.hash) {
+                const activeTab = document.querySelector(`.tab-link[data-target="${window.location.hash}"]`);
+                if (activeTab) activateTab(activeTab);
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    activateTab(this);
+                    // Update URL hash without jumping
+                    history.pushState(null, null, this.getAttribute('data-target'));
+                });
+            });
+
+            function activateTab(tabElement) {
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
+
+                tabElement.classList.add('active');
+                const targetId = tabElement.getAttribute('data-target');
+                document.querySelector(targetId).classList.add('active');
+            }
+        });
+    </script>
+}

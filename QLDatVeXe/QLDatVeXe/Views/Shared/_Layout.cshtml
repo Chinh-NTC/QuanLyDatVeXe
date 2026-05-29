@@ -24,8 +24,24 @@
         <li><a href="/NhaXe" class="@(ViewData["ActiveNav"]?.ToString() == "nhaxe" ? "active" : "")">Nhà xe</a></li>
       </ul>
       <div class="navbar-actions" id="navbar-actions">
-        <a href="/Login" class="btn btn-ghost">Đăng nhập</a>
-        <a href="/Register" class="btn btn-primary">Đăng ký</a>
+        @{
+            var userSession = QLDatVeXe.Helpers.SessionHelper.GetCurrentUser(Context.Session);
+        }
+        @if (userSession != null)
+        {
+            var userName = userSession.HoTen ?? "Khách";
+            <a href="/Account" class="btn btn-ghost" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+                 @(userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U")
+              </div>
+              <span>@userName</span>
+            </a>
+        }
+        else
+        {
+            <a href="/Login" class="btn btn-ghost">Đăng nhập</a>
+            <a href="/Register" class="btn btn-primary">Đăng ký</a>
+        }
       </div>
       <button class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -53,8 +69,8 @@
       </div>
       <div>
         <h5>Liên hệ</h5>
-        <ul>
-          <li><a href="#">📞 1900 xxxx</a></li>
+        <ul>    
+          <li><a href="#">📞 0339255698</a></li>
           <li><a href="#">✉️ support@busgo.vn</a></li>
         </ul>
       </div>
@@ -67,6 +83,26 @@
 
 <div id="toast-container"></div>
 <script src="~/assets/js/app.js" asp-append-version="true"></script>
+@if (TempData["Success"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof showToast === "function") {
+                showToast('@TempData["Success"]', 'success');
+            }
+        });
+    </script>
+}
+@if (TempData["Error"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof showToast === "function") {
+                showToast('@TempData["Error"]', 'error');
+            }
+        });
+    </script>
+}
 @RenderSection("Scripts", required: false)
 </body>
 </html>

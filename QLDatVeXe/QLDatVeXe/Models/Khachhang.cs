@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace QLDatVeXe.Models;
@@ -18,6 +18,8 @@ public partial class Khachhang
     public bool? GioiTinh { get; set; }
 
     public DateTime? NgayTao { get; set; }
+
+    public bool Trangthai { get; set; }
 
     public virtual ICollection<Danhgia> Danhgia { get; set; } = new List<Danhgia>();
 
