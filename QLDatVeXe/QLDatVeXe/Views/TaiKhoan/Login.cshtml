@@ -46,6 +46,12 @@
 
       <!-- LOGIN FORM -->
       <form id="form-login" method="post" action="/Login">
+        @if(ViewBag.Error != null) {
+            <div style="background:#fee2e2; color:#ef4444; padding:10px; border-radius:8px; margin-bottom:16px; font-size:0.85rem;">
+                ⚠️ @ViewBag.Error
+            </div>
+        }
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
         <div class="form-group mb-16">
           <label class="form-label">Tên đăng nhập</label>
           <input type="text" class="form-control" id="login-username" name="tenDangNhap"
@@ -74,6 +80,12 @@
 
       <!-- REGISTER FORM -->
       <form id="form-register" class="hidden" method="post" action="/Register">
+        @if(ViewBag.Error != null) {
+            <div style="background:#fee2e2; color:#ef4444; padding:10px; border-radius:8px; margin-bottom:16px; font-size:0.85rem;">
+                ⚠️ @ViewBag.Error
+            </div>
+        }
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
         <div class="grid-2" style="gap:12px">
           <div class="form-group">
             <label class="form-label">Họ tên <span style="color:var(--danger)">*</span></label>

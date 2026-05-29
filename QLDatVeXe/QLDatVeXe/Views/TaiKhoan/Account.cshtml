@@ -1,8 +1,12 @@
+@using QLDatVeXe.Models
 @{
     ViewData["Title"] = "Tài khoản — BusGo";
     ViewData["ActiveNav"] = "";
     Layout = "~/Views/Shared/_Layout.cshtml";
     string activeTab = ViewData["Tab"]?.ToString() ?? "orders";
+    
+    var kh = ViewBag.KhachHang as Khachhang;
+    var orders = ViewBag.Orders as List<Dondatve>;
 }
 
 @section PageCss {
@@ -14,9 +18,9 @@
   <!-- SIDEBAR -->
   <aside class="account-sidebar">
     <div class="card card-body" style="text-align:center;padding-bottom:20px">
-      <div class="account-avatar" id="acc-avatar">N</div>
-      <div class="account-name" id="acc-name">Nguyễn Văn A</div>
-      <div class="account-phone" id="acc-phone">0912345678</div>
+      <div class="account-avatar" id="acc-avatar">@kh?.HoTen.Substring(0,1).ToUpper()</div>
+      <div class="account-name" id="acc-name">@kh?.HoTen</div>
+      <div class="account-phone" id="acc-phone">@kh?.Sdt</div>
     </div>
     <nav class="acc-nav">
       <a class="acc-nav-item @(activeTab=="orders"?"active":"")" href="/Account?tab=orders">🎫 Lịch sử đặt vé</a>
@@ -37,91 +41,57 @@
           <h2>🎫 Lịch sử đặt vé</h2>
           <div class="order-filters">
             <select class="form-control" style="width:auto" id="order-filter" onchange="filterOrders()">
-              <option value="">Tất cả</option>
-              <option value="CHOXULY">Chờ xử lý</option>
-              <option value="DAXACNHAN">Đã xác nhận</option>
-              <option value="DAHUY">Đã hủy</option>
-              <option value="HOANTHANH">Hoàn thành</option>
+              <option value="">Mới nhất</option>
+              <option value="CHOXULY">CHOXULY</option>
+              <option value="THANHCONG">THANHCONG</option>
+              <option value="DAHUY">DAHUY</option>
+              <option value="BOCHUYEN">BOCHUYEN</option>
             </select>
           </div>
         </div>
         <div id="orders-list">
-          <!-- Đơn mẫu 1 -->
-          <a href="/TicketDetail?maDon=DV001" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
-            <div class="order-card" data-status="DAXACNHAN">
-              <div class="order-header">
-                <div>
-                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV001</span>
-                  <span class="order-date">25/05/2026 09:30</span>
-                </div>
-                <span class="badge badge-success">Đã xác nhận</span>
+          @if(orders != null && orders.Count > 0)
+          {
+              foreach(var o in orders)
+              {
+                  string displayStatus = o.TrangThai;
+                  string statusClass = "badge-gray";
+                  if(displayStatus == "THANHCONG") statusClass = "badge-success";
+                  if(displayStatus == "DAHUY" || displayStatus == "BOCHUYEN") statusClass = "badge-danger";
+                  if(displayStatus == "CHOXULY") statusClass = "badge-warning";
+                  
+                  <a href="/TicketDetail?maDon=@o.MaDon" class="order-card-link" style="text-decoration:none; color:inherit; display:block; margin-bottom:16px;">
+                      <div class="card card-body order-card" data-status="@displayStatus" style="transition: transform 0.2s, box-shadow 0.2s; border:1px solid #e2e8f0;">
+                          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed #e2e8f0;">
+                              <div>
+                                  <span style="font-weight:700; font-size:1.1rem; color:var(--primary);">@o.MaDon</span>
+                                  <span style="font-size:0.85rem; color:var(--gray-500); margin-left:12px;">@o.NgayDat?.ToString("dd/MM/yyyy HH:mm")</span>
+                              </div>
+                              <span class="badge @statusClass">@displayStatus</span>
+                          </div>
+                          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                              <div>
+                                  <div style="margin-bottom:8px; font-weight:600;">Số lượng ghế: @o.Chitietdatve.Count</div>
+                                  <div style="font-size:0.85rem; color:var(--gray-500);">Hành khách: @o.Tennguoidi - @o.Sdtnguoidi</div>
+                              </div>
+                              <div style="text-align:right;">
+                                  <div style="font-size:0.85rem; color:var(--gray-500); margin-bottom:4px;">Tổng tiền</div>
+                                  <div style="font-size:1.2rem; font-weight:800; color:var(--primary);">@o.TongTien?.ToString("N0")₫</div>
+                              </div>
+                          </div>
+                      </div>
+                  </a>
+              }
+          }
+          else
+          {
+              <div class="empty-state-orders" style="text-align:center; padding:60px 20px; color:#94a3b8;">
+                <div style="font-size:3rem; margin-bottom:16px;">🎫</div>
+                <div style="font-size:1.1rem; font-weight:600; color:#64748b; margin-bottom:8px;">Chưa có đơn đặt vé nào</div>
+                <div style="font-size:0.88rem; margin-bottom:24px;">Lịch sử đặt vé của bạn sẽ hiển thị ở đây.</div>
+                <a href="/Search" class="btn btn-primary" style="display:inline-block;">🔍 Tìm chuyến xe ngay</a>
               </div>
-              <div class="order-body">
-                <div class="order-meta">
-                  <div class="order-meta-item"><span>Tổng tiền</span><strong>700.000₫</strong></div>
-                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>700.000₫</strong></div>
-                </div>
-                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-                  <span class="badge badge-primary">🪑 Tầng 1 · Ghế A3</span>
-                  <span class="badge badge-primary">🪑 Tầng 1 · Ghế A7</span>
-                </div>
-              </div>
-              <div class="order-footer">
-                <div class="order-actions">
-                  <span class="btn btn-sm" style="background:white; color:var(--primary); border:1px solid var(--primary)">Chi tiết vé</span>
-                </div>
-              </div>
-            </div>
-          </a>
-
-          <!-- Đơn mẫu 2 -->
-          <a href="/TicketDetail?maDon=DV002" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
-            <div class="order-card" data-status="HOANTHANH">
-              <div class="order-header">
-                <div>
-                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV002</span>
-                  <span class="order-date">10/05/2026 14:00</span>
-                </div>
-                <span class="badge badge-gray">Hoàn thành</span>
-              </div>
-              <div class="order-body">
-                <div class="order-meta">
-                  <div class="order-meta-item"><span>Tổng tiền</span><strong>350.000₫</strong></div>
-                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>350.000₫</strong></div>
-                </div>
-                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-                  <span class="badge badge-success">🪑 Tầng 1 · Ghế B5</span>
-                </div>
-              </div>
-              <div class="order-footer">
-                <div class="order-actions">
-                  <span class="btn btn-sm" style="background:var(--primary); color:white">Đánh giá</span>
-                </div>
-              </div>
-            </div>
-          </a>
-
-          <!-- Đơn mẫu 3 -->
-          <a href="/TicketDetail?maDon=DV003" class="order-card-link" style="text-decoration:none; color:inherit; display:block">
-            <div class="order-card" data-status="DAHUY">
-              <div class="order-header">
-                <div>
-                  <span class="order-id" style="color:var(--primary); font-weight:700">Đơn #DV003</span>
-                  <span class="order-date">01/05/2026 08:00</span>
-                </div>
-                <span class="badge badge-danger">Đã hủy</span>
-              </div>
-              <div class="order-body">
-                <div class="order-meta">
-                  <div class="order-meta-item"><span>Tổng tiền</span><strong>180.000₫</strong></div>
-                  <div class="order-meta-item"><span>Đã thanh toán</span><strong>0₫</strong></div>
-                </div>
-                <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-                  <span class="badge badge-danger" style="text-decoration: line-through;">🪑 Tầng 2 · Ghế B3</span>
-                </div>
-              </div>
-            </div>
-          </a>
+          }
         </div>
       </div>
     }
@@ -133,27 +103,22 @@
         <div class="tab-header"><h2>👤 Thông tin cá nhân</h2></div>
         <div class="card card-body">
           <form method="post" action="/Account">
-            <input type="hidden" name="action" value="updateProfile" />
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Họ tên</label>
-                <input type="text" class="form-control" name="hoTen" id="prof-hoten" value="Nguyễn Văn A" required />
+                <input type="text" class="form-control" name="hoTen" value="@kh?.HoTen" required />
               </div>
               <div class="form-group">
                 <label class="form-label">Số điện thoại</label>
-                <input type="tel" class="form-control" id="prof-sdt" value="0912345678" readonly />
+                <input type="tel" class="form-control" name="sdt" value="@kh?.Sdt" required />
               </div>
               <div class="form-group">
-                <label class="form-label">Giới tính</label>
-                <select class="form-control" name="gioiTinh" id="prof-gioitinh">
-                  <option value="">-- Chọn --</option>
-                  <option value="1" selected>Nam</option>
-                  <option value="0">Nữ</option>
-                </select>
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-control" value="@kh?.TenDangNhap" readonly style="background:#f1f5f9;" />
               </div>
               <div class="form-group">
                 <label class="form-label">Ngày tạo tài khoản</label>
-                <input type="text" class="form-control" value="01/01/2026" readonly />
+                <input type="text" class="form-control" value="@kh?.NgayTao?.ToString("dd/MM/yyyy")" readonly style="background:#f1f5f9;" />
               </div>
             </div>
             <div style="margin-top:20px">
@@ -170,21 +135,10 @@
       <div class="tab-panel active">
         <div class="tab-header"><h2>⭐ Đánh giá của tôi</h2></div>
         <div id="reviews-list">
-          <div class="review-card">
-            <div class="review-header">
-              <div class="review-stars">★★★★★</div>
-              <span class="review-date">15/05/2026</span>
-            </div>
-            <div class="review-route">🚌 Bến Mỹ Đình → Bến Miền Đông</div>
-            <div class="review-comment">Chuyến xe rất tốt, tài xế lái ổn định, xe sạch sẽ, đúng giờ. Sẽ đặt lại lần sau!</div>
-          </div>
-          <div class="review-card">
-            <div class="review-header">
-              <div class="review-stars">★★★★☆</div>
-              <span class="review-date">12/05/2026</span>
-            </div>
-            <div class="review-route">🚌 Bến Miền Đông → Bến Đà Lạt</div>
-            <div class="review-comment">Xe thoải mái, điều hòa mát. Chỉ hơi trễ 15 phút so với lịch.</div>
+          <div style="text-align:center; padding:60px 20px; color:#94a3b8;">
+            <div style="font-size:3rem; margin-bottom:16px;">⭐</div>
+            <div style="font-size:1.1rem; font-weight:600; color:#64748b; margin-bottom:8px;">Chưa có đánh giá nào</div>
+            <div style="font-size:0.88rem;">Tính năng đánh giá đang được phát triển.</div>
           </div>
         </div>
       </div>
@@ -223,23 +177,12 @@
 
 @section Scripts {
   <script>
-    window.CTX = '';
-    window.ACC_DATA = { hoTen: 'Nguyễn Văn A', sdt: '0912345678', tab: '@activeTab' };
     function filterOrders() {
       const val = document.getElementById('order-filter').value;
       document.querySelectorAll('.order-card').forEach(card => {
         const st = card.getAttribute('data-status');
         card.closest('.order-card-link').style.display = (!val || st === val) ? 'block' : 'none';
       });
-    }
-    function setStar(val) {
-      document.querySelectorAll('.star-btn').forEach((s, i) => {
-        s.style.color = i < val ? '#f59e0b' : '#94a3b8';
-      });
-    }
-    function submitReview() {
-      showToast('Đánh giá của bạn đã được gửi!', 'success');
-      closeModal('review-modal');
     }
   </script>
   <script src="~/assets/js/account.js" asp-append-version="true"></script>

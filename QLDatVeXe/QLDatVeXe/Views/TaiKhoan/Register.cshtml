@@ -40,12 +40,21 @@
 
       <!-- TABS -->
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
+        <button class="auth-tab" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
         <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Đăng ký</button>
       </div>
 
+      <!-- Thông báo lỗi chung -->
+      @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+      {
+        <div id="auth-error-box" style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-bottom:12px;color:#dc2626;font-size:.88rem;display:flex;align-items:center;gap:8px">
+          <span>⚠️</span> <span>@ViewBag.Error</span>
+        </div>
+      }
+
       <!-- LOGIN FORM -->
       <form id="form-login" method="post" action="/Login">
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
         <div class="form-group mb-16">
           <label class="form-label">Tên đăng nhập</label>
           <input type="text" class="form-control" id="login-username" name="tenDangNhap"
@@ -74,6 +83,7 @@
 
       <!-- REGISTER FORM -->
       <form id="form-register" class="hidden" method="post" action="/Register">
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
         <div class="grid-2" style="gap:12px">
           <div class="form-group">
             <label class="form-label">Họ tên <span style="color:var(--danger)">*</span></label>
@@ -156,6 +166,12 @@
     document.getElementById('tab-login').classList.toggle('active', isLogin);
     document.getElementById('tab-register').classList.toggle('active', !isLogin);
   }
+
+  // Nếu có lỗi từ server sau khi submit đăng ký → tự mở tab đăng ký
+  (function() {
+    var activeTab = '@(ViewBag.ActiveTab as string ?? "login")';
+    switchAuthTab(activeTab);
+  })();
 </script>
 </body>
 </html>
